@@ -5,6 +5,11 @@ Welcome to the Beginner's Crash Course to Elastic Stack!
 
 This repo contains all resources shared during Part 3: Running full text queries and combined queries with Elasticsearch and Kibana.
 
+Workshop objectives:
+- delve deeper into more advanced search queries designed to search text fields
+- build a combination of queries to answer more complex questions 
+- control precision and scoring within the combination of queries
+
 ## Resources
 
 [Free Elastic Cloud Trial](https://ela.st/elastic-beginners)
