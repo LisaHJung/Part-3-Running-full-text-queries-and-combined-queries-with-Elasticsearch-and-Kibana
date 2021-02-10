@@ -6,7 +6,7 @@ Welcome to the Beginner's Crash Course to Elastic Stack!
 This repo contains all resources shared during Part 3: Running full text queries and combined queries with Elasticsearch and Kibana.
 
 Workshop objectives:
-- delve deeper into more advanced search queries designed to search text fields
+- delve deeper into advanced search queries designed to search text fields
 - build a combination of queries to answer more complex questions 
 - control precision and scoring within the combination of queries
 
@@ -25,11 +25,11 @@ Workshop objectives:
 ## Search for phrases 
 
 ### The match_phrase query
-This query is used to search for terms that are near each other. 
+This query is used to search for phrases(i.e. a group of search terms that are near each other). 
 
 Syntax: 
 ```
-GET enter_the_name_of_the_index_here/_search
+GET Enter_the_name_of_the_index_here/_search
 {
   "query": {
     "match_phrase": {
@@ -45,25 +45,26 @@ The following three things must happen for ingest nodes to cause a hit:
 
 Example: 
 ```
-GET enter_the_name_of_the_index_here/_search
+GET index/_search
 {
   "query": {
     "match_phrase": {
-      "content": "ingest nodes"
+      "content": "ingest nodes" or "open data"
     }
   }
 }
 ```
+
 Expected response from Elasticsearch:
 
 When you search using match_phrase, you get eight results. Precision is better, but recall is much, much worse.
 
 #### The slop Parameter 
-If you want to increase the recall of a  match_phrase,  query, you can introduce some flexibility into the phrase by using the slop parameter. This allows the terms to be close to each other but not necessarily next to each other, thus increasing the recall value. The slop parameter indicates how far apart the terms are allowed to be while still considering the document a match. Take a moment to review the query below. 
+If you want to increase the recall of a  match_phrase query, you can introduce some flexibility into the phrase by using the slop parameter. This allows the terms to be close to each other but not necessarily next to each other, thus increasing the recall value. The slop parameter indicates how far apart the terms are allowed to be while still considering the document a match. Take a moment to review the query below. 
 
 Syntax:
 ```
-GET name_of_index/_search
+GET Enter_the_name_of_the_index_here/_search
 {
   "query": {
     "match_phrase": {
@@ -93,15 +94,16 @@ Allows one word to be between the search terms.
 
 Expected response from Elasticsearch:
 
-
-#### The multi-match Query
+#### Running a match query against multiple fields 
 
 When a user searches for something, the context of the search is not always known. You will have to make a guess. Let’s say you have a user who types in "Shay Banon" in the search bar. Is the user looking for articles by Shay Banon or articles related to Shay Banon?
 
 There are 3 different fields you could search over for "Shay Banon." 
 Author, title, and content fields. 
 
-This type of query provides a convenient shorthand for running a match query against multiple fields. For each document, a score is computed for the term for each field. The highest of those scores will be the score for that document. This is the default scoring behavior of the multi_match query ("type": "best_field").
+Why not query all three of those fields? You can query for Shay Banon in the author, title, and content fields using a multi_match query. 
+
+The multi-match query provides a convenient shorthand for running a match query against multiple fields. For each document, a score is computed for the term for each field. The highest of those scores will be the score for that document. This is the default scoring behavior of the multi_match query ("type": "best_field").
 
 This type of query provides a convenient shorthand for running a match query against multiple fields. 
 
@@ -109,15 +111,15 @@ By default, Elasticsearch only considers the best scoring field when calculating
 
 Syntax:
 ```
-GET name_of_index/_search
+GET Enter_the_name_of_the_index_here/_search
 {
   "query": {
     "multi_match": {
-      "query":"shay banon",
+      "query":"Enter search terms here",
       "fields": [
-        "title",
-        "content",
-        "author"
+        "List the field you want to search over",
+        "List the field you want to search over",
+        "List the field you want to search over"
         ],
         "type": "best_fields"
     }
@@ -151,14 +153,14 @@ The answer is, yes, sort of. However, your user may not agree. Let’s try to ma
 #### Per-field boosting
 Boost is one other dial to use for better search results.  Let’s say you want the blog’s title to carry more weight than the content or author fields. Review the example below to learn how you can do this.
 
-You can boost the score of the ttile field using the carat(^) symbol
+You can boost the score of the title field using the carat(^) symbol.
 Syntax:
 ```
-GET name_of_index/_search
+GET Enter_the_name_of_the_index_here/_search
 {
   "query": {
     "multi_match": {
-      "query":"Enter a search phrase",
+      "query":"Enter search terms",
       "fields": [
         "List field you want to boost^2",
         "List field you want to search over",
@@ -192,19 +194,20 @@ Is there a best practice for boosting?
 
 As always, it depends. Experiment and analyze your search results to find the best formula for your use case.  For our blogs dataset, search terms often appear in both the "title" and "content" fields, but searching within the title field will yield better hits.
 
-Let's try searching for a Topic
+#### Let's try searching for a Topic
 Suppose you are looking for a blog that mentions "elasticsearch training." Notice the query here contains the popular term "elasticsearch", so naturally there will be a lot of hits. 
 See google drive
 
 Why do you think there are so many hits? 
 So many hits were returned because the multi_match query performs a match query (with the default "or" logic) on multiple fields. The word "elasticsearch" occurs frequently in the Elastic blogs so naturally, there are a lot of hits.
+
 #### Improving Precision with match_phrase
 See google drive
 The top hits returned are good, but the precision is not great. Let’s search for the phrase "elasticsearch training" instead. You can improve precision by performing a phrase type match (the default type is best_fields). The phrase type performs a match_phrase query on each field and selects the best score.
 
 Syntax:
 ```
-GET name_of_index/_search
+GET Enter_the_name_of_the_index_here/_search
 {
   "query": {
     "multi_match": {
@@ -221,7 +224,6 @@ GET name_of_index/_search
 ```
 Example:
 ```
-GET news_headlines/_search
 GET name_of_index/_search
 {
   "query": {
