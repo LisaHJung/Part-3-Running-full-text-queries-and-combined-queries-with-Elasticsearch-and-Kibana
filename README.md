@@ -1,5 +1,5 @@
 # Beginner's Crash Course to Elastic Stack Series
-## Part-3-Running-full-text-queries-and-combined-queries-with-Elasticsearch-and-Kibana
+## Part 3: Running full text queries and combined queries with Elasticsearch and Kibana
 
 Welcome to the Beginner's Crash Course to Elastic Stack!
 
