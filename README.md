@@ -22,10 +22,24 @@ Workshop objectives:
 
 [Elastic America Virtual Chapter](https://community.elastic.co/amer-virtual/) Want to attend live workshops? Join the Elastic Vancouver Chapter to get the deets!
 
-## Search for phrases 
+## Retrieve all documents from an index
 
-### The match_phrase query
-This query is used to search for phrases(i.e. a group of search terms that are near each other). 
+Syntax: 
+```
+GET enter_name_of_the_index_here/_search
+```
+Example: 
+```
+GET song_lyrics/_search
+```
+Expected response from Elasticsearch:
+
+Elasticsearch displays a number of hits and a sample of 10 search results by default.  
+
+![image](https://user-images.githubusercontent.com/60980933/107825991-53bb0780-6d41-11eb-90f9-eef0b5d0004f.png)
+
+## Search for phrases 
+The match_phrase query is used to search for phrases(i.e. a group of search terms that appear in that order and are next to each other). 
 
 Syntax: 
 ```
@@ -49,7 +63,7 @@ GET index/_search
 {
   "query": {
     "match_phrase": {
-      "content": "ingest nodes" or "open data"
+      "Lyrics": "ingest nodes" or "open data"
     }
   }
 }
