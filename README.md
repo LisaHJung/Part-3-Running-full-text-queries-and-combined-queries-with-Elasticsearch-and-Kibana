@@ -22,7 +22,7 @@ Workshop objectives:
 
 [Elastic America Virtual Chapter](https://community.elastic.co/amer-virtual/) Want to attend live workshops? Join the Elastic Vancouver Chapter to get the deets!
 
-## Retrieve all documents from an index
+## Get information about documents in an index
 
 Syntax: 
 ```
