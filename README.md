@@ -12,6 +12,8 @@ Workshop objectives:
 
 ## Resources
 
+[Beginner's Crash Course Table of Contents]() Interested in other workshops of this series? Check out the table of contents.
+
 [Free Elastic Cloud Trial](https://ela.st/elastic-beginners)
 
 [Instructions](https://dev.to/elastic/downloading-elasticsearch-and-kibana-macos-linux-and-windows-1mmo) for downloading Elasticsearch and Kibana
