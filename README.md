@@ -8,7 +8,7 @@ This repo contains all resources shared during Part 3: Running full text queries
 Workshop objectives:
 - delve deeper into advanced search queries designed to search text fields
 - build a combination of queries to answer more complex questions 
-- control precision and scoring within the combination of queries
+- fine tune relevancy of complex queries
 
 ## Resources
 
