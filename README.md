@@ -40,40 +40,89 @@ Elasticsearch displays a number of hits and a sample of 10 search results by def
 
 ![image](https://user-images.githubusercontent.com/60980933/107825991-53bb0780-6d41-11eb-90f9-eef0b5d0004f.png)
 
-## Search for phrases 
-The match_phrase query is used to search for phrases(i.e. a group of search terms that appear in that order and are next to each other). 
+## Search queries
+
+### When to use the match query: When order or proximity in which search terms are found is not as important to you. 
+
+*match query* is a standard query for performing a full text search. This query becomes useful when your priority is to retrieve documents as long as these contain the search terms.  The order or proximity in which the search terms are found are not important to your use case.  
+
+Syntax:
+```
+GET enter_name_of_index_here/_search
+{
+  "query": {
+    "match": {
+      "Specify the field you want to search":{
+        "query":"Enter search terms"
+   }
+  }
+ }
+}
+```
+
+### What happens when you use the match query for search requests where order or proximity in which search terms are found is important to search relevance. 
+
+Example: Look for a song with a phrase "thinking out loud."
+```
+GET song_lyrics/_search
+{
+  "query": {
+    "match": {
+      "Lyric": "thinking out loud"
+    }
+  }
+}
+```
+Expected response from Elasticsearch:
+
+Elasticsearch returns 149 hits. Among these hits, some of these hits do contain the exact phrase "thinking out loud".  
+
+![image](https://user-images.githubusercontent.com/60980933/108258667-84be8200-711d-11eb-9d54-6a3343a1ded1.png)
+
+However, among the hits, you will see many hits that have one or few of the search terms scattered across the documents. The match_query has high recall but low precision as it returns a lot of loosely related documents. 
+
+![image](https://user-images.githubusercontent.com/60980933/108258792-a1f35080-711d-11eb-9b95-ea8430541091.png)
+
+### When to use the match_phrase query: When the order and proxmity in which the search terms are found are important(i.e. searching for phrases, lyrics & etc) in improving the relevance of your search.
 
 Syntax: 
 ```
-GET Enter_the_name_of_the_index_here/_search
+GET enter_name_of_index_here/_search
+{
+  "query": {
+    "match": {
+      "Specify the field you want to search":{
+        "query":"Enter search terms"
+   }
+  }
+ }
+}
+```
+Example: 
+```
+GET song_lyrics/_search
 {
   "query": {
     "match_phrase": {
-      "Specify the field you want to search over": "Enter the phrase you are searching for"
+      "Lyric": "thinking out loud"
     }
   }
 }
 ```
-The following three things must happen for ingest nodes to cause a hit:
-1. both "ingest" and "nodes" must appear in the content field
+When the match_phrase parameter is used, all hits returned will meet the following criteria:
+1. the search terms "thinking", "out", and "loud" must appear in the Lyric field
 2. the terms must appear in that order
 3. the terms must appear next to each other
 
-Example: 
-```
-GET index/_search
-{
-  "query": {
-    "match_phrase": {
-      "Lyrics": "ingest nodes" or "open data"
-    }
-  }
-}
-```
-
 Expected response from Elasticsearch:
 
-When you search using match_phrase, you get eight results. Precision is better, but recall is much, much worse.
+With match_phrase parameter, we get 4 hits returned. All 4 hits satisfy the criteria mentiond above. 
+
+![image](https://user-images.githubusercontent.com/60980933/108267685-c0127e00-7128-11eb-852c-a38ceb149962.png)
+
+![image](https://user-images.githubusercontent.com/60980933/108267697-c4d73200-7128-11eb-945d-09ad23f89f61.png)
+
+With the match_phrase parameter, you get higher precision but lower recall. 
 
 #### The slop Parameter 
 If you want to increase the recall of a  match_phrase query, you can introduce some flexibility into the phrase by using the slop parameter. This allows the terms to be close to each other but not necessarily next to each other, thus increasing the recall value. The slop parameter indicates how far apart the terms are allowed to be while still considering the document a match. Take a moment to review the query below. 
@@ -94,12 +143,12 @@ GET Enter_the_name_of_the_index_here/_search
 ```
 Example:
 ```
-GET name_of_index/_search
+GET song_lyrics/_search
 {
   "query": {
     "match_phrase": {
       "content":{
-        "query": "open data",
+        "query": "thinking out loud",
         "slop": 1
       }
     }
