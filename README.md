@@ -62,26 +62,25 @@ GET enter_name_of_index_here/_search
 
 ### What happens when you use the match query for search requests where order or proximity in which search terms are found is important to search relevance. 
 
-Example: Look for a song with a phrase "thinking out loud."
+Example: Look for an article about Ed Sheeran's "Shape of you" song. 
 ```
-GET song_lyrics/_search
+GET news_headlines/_search
 {
   "query": {
     "match": {
-      "Lyric": "thinking out loud"
-    }
+      "headline":{
+        "query":"Shape of you"
+   }
   }
+ }
 }
 ```
 Expected response from Elasticsearch:
 
-Elasticsearch returns 149 hits. Among these hits, some of these hits do contain the exact phrase "thinking out loud".  
+Elasticsearch returns greater than 10,000 hits. The top hit as well as many others in the search results only contain the search terms "you" and "shape". These terms are not found in the same order or proximity to each other as the search query "Shape of you".  Along with a few articles about te song "Shape of you", it pulls up articles about being in shape or what shape of your face says about you. 
 
-![image](https://user-images.githubusercontent.com/60980933/108258667-84be8200-711d-11eb-9d54-6a3343a1ded1.png)
+When the match_query is used to search for a phrase, it has high recall but low precision as it returns a lot of loosely related documents.
 
-However, among the hits, you will see many hits that have one or few of the search terms scattered across the documents. The match_query has high recall but low precision as it returns a lot of loosely related documents. 
-
-![image](https://user-images.githubusercontent.com/60980933/108258792-a1f35080-711d-11eb-9b95-ea8430541091.png)
 
 ### When to use the match_phrase query: When the order and proxmity in which the search terms are found are important(i.e. searching for phrases, lyrics & etc) in improving the relevance of your search.
 
@@ -100,64 +99,29 @@ GET enter_name_of_index_here/_search
 ```
 Example: 
 ```
-GET song_lyrics/_search
+GET news_headlines/_search
 {
   "query": {
     "match_phrase": {
-      "Lyric": "thinking out loud"
-    }
+      "headline":{
+        "query":"Shape of You"
+   }
   }
+ }
 }
 ```
 When the match_phrase parameter is used, all hits returned will meet the following criteria:
-1. the search terms "thinking", "out", and "loud" must appear in the Lyric field
+1. the search terms "Shape", "of", and "you" must appear in the Lyric field
 2. the terms must appear in that order
 3. the terms must appear next to each other
 
 Expected response from Elasticsearch:
 
-With match_phrase parameter, we get 4 hits returned. All 4 hits satisfy the criteria mentiond above. 
+With match_phrase parameter, we get 3 hits returned. All 3 hits satisfy the criteria mentiond above. 
 
-![image](https://user-images.githubusercontent.com/60980933/108267685-c0127e00-7128-11eb-852c-a38ceb149962.png)
-
-![image](https://user-images.githubusercontent.com/60980933/108267697-c4d73200-7128-11eb-945d-09ad23f89f61.png)
+![image](https://user-images.githubusercontent.com/60980933/108422566-f537d280-71f3-11eb-8340-2899b5fbc61e.png)
 
 With the match_phrase parameter, you get higher precision but lower recall. 
-
-#### The slop Parameter 
-If you want to increase the recall of a  match_phrase query, you can introduce some flexibility into the phrase by using the slop parameter. This allows the terms to be close to each other but not necessarily next to each other, thus increasing the recall value. The slop parameter indicates how far apart the terms are allowed to be while still considering the document a match. Take a moment to review the query below. 
-
-Syntax:
-```
-GET Enter_the_name_of_the_index_here/_search
-{
-  "query": {
-    "match_phrase": {
-      "Name the field you want to search over":{
-        "query": "Enter the phrase you are searching for",
-        "slop": "Specify number of words permitted to be between the phrases"
-      }
-    }
-  }
-}
-```
-Example:
-```
-GET song_lyrics/_search
-{
-  "query": {
-    "match_phrase": {
-      "content":{
-        "query": "thinking out loud",
-        "slop": 1
-      }
-    }
-  }
-}
-```
-Allows one word to be between the search terms. 
-
-Expected response from Elasticsearch:
 
 #### Running a match query against multiple fields 
 
