@@ -125,19 +125,6 @@ With the match_phrase parameter, you get higher precision but lower recall.
 
 #### Running a match query against multiple fields 
 
-When a user searches for something, the context of the search is not always known. You will have to make a guess. Let’s say you have a user who types in "Shay Banon" in the search bar. Is the user looking for articles by Shay Banon or articles related to Shay Banon?
-
-There are 3 different fields you could search over for "Shay Banon." 
-Author, title, and content fields. 
-
-Why not query all three of those fields? You can query for Shay Banon in the author, title, and content fields using a multi_match query. 
-
-The multi-match query provides a convenient shorthand for running a match query against multiple fields. For each document, a score is computed for the term for each field. The highest of those scores will be the score for that document. This is the default scoring behavior of the multi_match query ("type": "best_field").
-
-This type of query provides a convenient shorthand for running a match query against multiple fields. 
-
-By default, Elasticsearch only considers the best scoring field when calculating the _score (best_fields). A score will be computed for each field and the highest score will be the one that is used to score the document. 
-
 Syntax:
 ```
 GET Enter_the_name_of_the_index_here/_search
@@ -149,35 +136,33 @@ GET Enter_the_name_of_the_index_here/_search
         "List the field you want to search over",
         "List the field you want to search over",
         "List the field you want to search over"
-        ],
-        "type": "best_fields"
+        ]
     }
   }
 }
 ````
 Example:
 ```
-GET name_of_index/_search
+GET news_headlines/_search
 {
   "query": {
     "multi_match": {
-      "query":"shay banon",
+      "query":"michelle obama",
       "fields": [
-        "title",
-        "content",
+        "headline",
+        "short_description",
         "author"
-        ],
-        "type": "best_fields"
+        ]
     }
   }
 }
+
 ```
-
 Expected response from Elasticsearch:
+We see 3044 hits that contain "michelle obama" in the headline or short_description or author field. But you will see that this hit came up even though michelle obama was not the main topic of the article. 
 
-Next, take a moment to review the response from the previous query about Shay Banon below and ask yourself the following question: Are they relevant?
+![image](https://user-images.githubusercontent.com/60980933/108424827-e9014480-71f6-11eb-90f5-f7276aebbd0d.png)
 
-The answer is, yes, sort of. However, your user may not agree. Let’s try to make one field more important than the others. In our particular use case, the title field may be a good candidate. If "Shay Banon" were to be found in the title of a blog, that blog would surely be relevant to "Shay Banon."
 
 #### Per-field boosting
 Boost is one other dial to use for better search results.  Let’s say you want the blog’s title to carry more weight than the content or author fields. Review the example below to learn how you can do this.
@@ -201,34 +186,47 @@ GET Enter_the_name_of_the_index_here/_search
 ```
 Example:
 ```
-GET name_of_index/_search
+GET news_headlines/_search
 {
   "query": {
     "multi_match": {
-      "query":"Enter a search phrase",
+      "query":"michelle obama",
       "fields": [
-        "title^2",
-        "content",
+        "headline^2",
+        "short_description",
         "author"
-        ],
+        ]
+    }
   }
- }
 }
 ```
 Expected response from Elasticsearch:
 
-The response comes back with 151 hits, but the order of the hits have changed. The highest score has Shay Banon in the title, which was the field boosted. 
+![image](https://user-images.githubusercontent.com/60980933/108425052-2fef3a00-71f7-11eb-8bf1-8c13d6a0a37c.png)
 
-Is there a best practice for boosting? 
-
-As always, it depends. Experiment and analyze your search results to find the best formula for your use case.  For our blogs dataset, search terms often appear in both the "title" and "content" fields, but searching within the title field will yield better hits.
+Yields same number of hits(3044) but the order of the hits have changed. The hits ranking higher on the list has Michelle Obama in the boosted field, headline. The articles are definitely about Michelle Obama!
 
 #### Let's try searching for a Topic
-Suppose you are looking for a blog that mentions "elasticsearch training." Notice the query here contains the popular term "elasticsearch", so naturally there will be a lot of hits. 
-See google drive
+What if you are looking for an article that mentions "Party planning"? This query contains the popular term "party" or "planning?, so you will see a lot of hits. 
 
+```
+GET news_headlines/_search
+{
+  "query": {
+    "multi_match": {
+      "query":"party planning",
+      "fields": [
+        "headline^2",
+        "short_description"
+        ]
+    }
+  }
+}
+```
+Response from Elasticsearch:
 Why do you think there are so many hits? 
 So many hits were returned because the multi_match query performs a match query (with the default "or" logic) on multiple fields. The word "elasticsearch" occurs frequently in the Elastic blogs so naturally, there are a lot of hits.
+![image](https://user-images.githubusercontent.com/60980933/108427330-39c66c80-71fa-11eb-9019-5c274754acad.png)
 
 #### Improving Precision with match_phrase
 See google drive
@@ -253,15 +251,14 @@ GET Enter_the_name_of_the_index_here/_search
 ```
 Example:
 ```
-GET name_of_index/_search
+GET news_headlines/_search
 {
   "query": {
     "multi_match": {
-      "query":"elasticsearch training",
+      "query":"party planning",
       "fields": [
-        "title^2",
-        "content",
-        "author"
+        "headline^2",
+        "short_description"
         ],
         "type": "phrase"
     }
@@ -269,24 +266,7 @@ GET name_of_index/_search
 }
 ```
 Expected response from Elasticsearch:
-
-#### Mispelling
-
-Or rather, how can you deal with "misspelled words." In today’s world, you expect a search application to grant some leniency in terms of spelling. Let’s say you search for "shark alocasion". You don’t have blogs about sharks but you do have blogs about "shard allocation".
-
-One thing you can do to help in this situation is to add fuzziness to your queries. 
-CHECK OUT NOTES ON VIDEOS from ENG I AND ADD CONTENT HERE. 
-Adding fuzziness to a query
-The match query has a "fuzziness" property that can be set to 0, 1, or 2. It can also be set to "auto". If you are not sure what value to set the fuzziness to, use the "auto" setting. The "auto" setting is the preferred way to use fuzziness as it defines the distance based on the length of the query terms. One thing to note, if the query has multiple terms, the fuzziness value is applied to each term separately.
-
-Now, let's see if you can find "shard" by searching for the misspelled word "shark". Watch the demonstration below to learn more.
-
-Fuzziness is an easy solution to the misspelling of words. However, it has a high CPU overhead in addition to your results having very low precision. Fuzziness can be used to deal with misspellings in the data, but it is not recommended for dealing with misspellings in queries. 
-
-To learn more about how to properly handle user misspelling, it is recommended that you take the following courses:
-(delve into this if I need more content)
-Improving Search with Text Analysis
-Improving Search with Suggestions
+![image](https://user-images.githubusercontent.com/60980933/108427545-92960500-71fa-11eb-99f3-8e8b6d2f446d.png)
 
 ** Add poll questions: True or false
 The match_phrase query can be used for searching for multiple terms that are near each other
@@ -295,35 +275,6 @@ Fuzziness is an easy solution to deal with misspelling but has high CPU overhead
 
 I also like the end of the section questions. Incorporate this somehow. 
 
-Syntax:
-```
-GET name_of_index/_search
-{
-  "query": {
-    "match": {
-      "Enter the field you want to search": {
-        "query": "Enter search terms",
-        "fuzziness": "Enter 0,1 or 2
-      }
-    }
-  }
-}
-```
-Example:
-```
-GET name_of_index/_search
-{
-  "query": {
-    "match": {
-      "content": {
-        "query": "monitering datu",
-        "fuzziness": 1
-      }
-    }
-  }
-}
-```
-Expected response from Elasticsearch: 
 
 ### Combined Queries
 
