@@ -84,7 +84,7 @@ Expected response from Elasticsearch:
 ## Full Text Queries
 ### Searching for search terms
 
-*match query* is a standard query for performing a full text search. This query retrieves documents that contain the search terms in any way, shape or form. The order and the proximity in which the search terms are found(i.e. phrases) are not considered as a priority. 
+`match query` is a standard query for performing a full text search. This query retrieves documents that contain the search terms in any way, shape or form. The order and the proximity in which the search terms are found(i.e. phrases) are not considered as a priority. 
 
 Syntax:
 ```
@@ -104,20 +104,6 @@ GET enter_name_of_index_here/_search
 What happens when you use the match query to search for phrases?
 Let's search for articles about Ed Sheeran's song "Shape of you" using the match query.
 
-Syntax:
-```
-GET enter_name_of_index_here/_search
-{
-  "query": {
-    "match": {
-      "Specify the field you want to search":{
-        "query":"Enter search terms"
-   }
-  }
- }
-}
-```
-
 Example: 
 ```
 GET news_headlines/_search
@@ -133,7 +119,9 @@ GET news_headlines/_search
 ```
 Expected response from Elasticsearch:
 
-Elasticsearch returns greater than 10,000 hits. The top hit as well as many others in the search results only contain the search terms "you" and "shape". These terms are not found in the same order or proximity to each other as the search query "Shape of you".  Along with a few articles about te song "Shape of you", it pulls up articles about being in shape or what shape of your face says about you. 
+![image](https://user-images.githubusercontent.com/60980933/108571746-17058800-72ce-11eb-8b44-57df1cbb35d1.png)
+
+Elasticsearch returns greater than 10,000 hits. The top hit as well as many others in the search results only contain the search terms "you" and "shape". These terms are not found in the same order or proximity to each other as the search query "Shape of you".  Along with a few articles about the song "Shape of you", it pulls up articles about being in shape or what shape of your face says about you. 
 
 When the match_query is used to search for a phrase, it has high recall but low precision as it returns a lot of loosely related documents.
 
