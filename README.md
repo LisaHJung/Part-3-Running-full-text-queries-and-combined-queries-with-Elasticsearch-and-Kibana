@@ -101,7 +101,7 @@ GET enter_name_of_index_here/_search
 ```
 
 ###  Searching for a phrase
-What happens when you use the match query to search for phrases?
+#### What happens when you use the `match query` to search for phrases?
 Let's search for articles about Ed Sheeran's song "Shape of you" using the match query.
 
 Example: 
@@ -123,17 +123,16 @@ Expected response from Elasticsearch:
 
 Elasticsearch returns greater than 10,000 hits. The top hit as well as many others in the search results only contain the search terms "you" and "shape". These terms are not found in the same order or proximity to each other as the search query "Shape of you".  Along with a few articles about the song "Shape of you", it pulls up articles about being in shape or what shape of your face says about you. 
 
-When the match_query is used to search for a phrase, it has high recall but low precision as it returns a lot of loosely related documents.
+When the `match query` is used to search for a phrase, it has high recall but low precision as it returns a lot of loosely related documents.
 
-
-### When to use the match_phrase query: When the order and proxmity in which the search terms are found are important(i.e. searching for phrases, lyrics & etc) in improving the relevance of your search.
+#### Searching for phrases using the `match_phrase` query
 
 Syntax: 
 ```
 GET enter_name_of_index_here/_search
 {
   "query": {
-    "match": {
+    "match_phrase": {
       "Specify the field you want to search":{
         "query":"Enter search terms"
    }
@@ -154,8 +153,8 @@ GET news_headlines/_search
  }
 }
 ```
-When the match_phrase parameter is used, all hits returned will meet the following criteria:
-1. the search terms "Shape", "of", and "you" must appear in the Lyric field
+When the match_phrase parameter is used, all hits returned must meet the following criteria:
+1. the search terms "Shape", "of", and "you" must appear in the headline field
 2. the terms must appear in that order
 3. the terms must appear next to each other
 
