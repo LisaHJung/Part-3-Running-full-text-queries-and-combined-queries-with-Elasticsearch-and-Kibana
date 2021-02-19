@@ -6,13 +6,13 @@ Welcome to the Beginner's Crash Course to Elastic Stack!
 This repo contains all resources shared during Part 3: Running full text queries and combined queries with Elasticsearch and Kibana.
 
 Workshop objectives:
-- delve deeper into advanced search queries designed to search text fields
+- delve deeper into advanced queries designed to search text fields
 - build a combination of queries to answer more complex questions 
-- fine tune relevancy of complex queries
+- fine tune the relevance of search results
 
 ## Resources
 
-[Beginner's Crash Course Table of Contents]() Interested in other workshops of this series? Check out the table of contents.
+[Beginner's Crash Course Table of Contents](https://github.com/LisaHJung/Beginners-Crash-Course-to-the-Elastic-Stack-Series) Interested in other workshops of this series? Check out the table of contents.
 
 [Free Elastic Cloud Trial](https://ela.st/elastic-beginners)
 
@@ -20,11 +20,18 @@ Workshop objectives:
 
 [Presentation]()
 
-[Dataset]() from Kaggle used for workshop
+[Dataset](https://www.kaggle.com/rmisra/news-category-dataset) from Kaggle used for workshop
 
 [Elastic America Virtual Chapter](https://community.elastic.co/amer-virtual/) Want to attend live workshops? Join the Elastic Vancouver Chapter to get the deets!
 
-## Get information about documents in an index
+## Review from Workshop Part 2
+There are two main ways to search in Elasticsearch:
+1) Queries: Queries retrieve documents that match the criteria. 
+2) Aggregations: An aggregation summarizes your data as metrics, statistics, and other analytics.  
+
+### Search queries
+#### Get information about documents in an index
+The following query will retrieve all documents that exist in the specified index. 
 
 Syntax: 
 ```
@@ -32,19 +39,52 @@ GET enter_name_of_the_index_here/_search
 ```
 Example: 
 ```
-GET song_lyrics/_search
+GET news_headlines/_search
 ```
 Expected response from Elasticsearch:
 
 Elasticsearch displays a number of hits and a sample of 10 search results by default.  
 
-![image](https://user-images.githubusercontent.com/60980933/107825991-53bb0780-6d41-11eb-90f9-eef0b5d0004f.png)
+![image](https://user-images.githubusercontent.com/60980933/105432767-8c216700-5c15-11eb-9ea2-ef74a3bc5f1b.png)
 
-## Search queries
+### Aggregations Request
+#### Analyze the data to show the categories of news headlines in our dataset
+Syntax:
+```
+GET enter_name_of_the_index_here/_search
+{
+  "aggs": {
+    "name your aggregation here": {
+      "specify aggregation type here": {
+        "field": "name the field you want to aggregate here",
+        "size": state how many buckets you want returned here
+      }
+    }
+  }
+}
+```
+Example:
+```
+GET news_headlines/_search
+{
+  "aggs": {
+    "by_category": {
+      "terms": {
+        "field": "category",
+        "size": 100
+      }
+    }
+  }
+}
+```
+Expected response from Elasticsearch:
 
-### When to use the match query: When order or proximity in which search terms are found is not as important to you. 
+![image](https://user-images.githubusercontent.com/60980933/105434428-cc361900-5c18-11eb-9db7-e7441ac5a1ac.png)
 
-*match query* is a standard query for performing a full text search. This query becomes useful when your priority is to retrieve documents as long as these contain the search terms.  The order or proximity in which the search terms are found are not important to your use case.  
+## Full Text Queries
+### Searching for search terms
+
+*match query* is a standard query for performing a full text search. This query retrieves documents that contain the search terms in any way, shape or form. The order and the proximity in which the search terms are found(i.e. phrases) are not considered as a priority. 
 
 Syntax:
 ```
@@ -60,9 +100,25 @@ GET enter_name_of_index_here/_search
 }
 ```
 
-### What happens when you use the match query for search requests where order or proximity in which search terms are found is important to search relevance. 
+###  Searching for a phrase
+What happens when you use the match query to search for phrases?
+Let's search for articles about Ed Sheeran's song "Shape of you" using the match query.
 
-Example: Look for an article about Ed Sheeran's "Shape of you" song. 
+Syntax:
+```
+GET enter_name_of_index_here/_search
+{
+  "query": {
+    "match": {
+      "Specify the field you want to search":{
+        "query":"Enter search terms"
+   }
+  }
+ }
+}
+```
+
+Example: 
 ```
 GET news_headlines/_search
 {
@@ -315,7 +371,50 @@ GET name_of_index/_search
   }
 }
 ```
+Find what categories Michelle Obama is found. 
+![image](https://user-images.githubusercontent.com/60980933/108541130-5668b000-729f-11eb-80aa-8e37b6dc016c.png)
+```
+GET news_headlines/_search
+{
+  "query": {
+    "match_phrase": { 
+      "headline": "Michelle Obama"
+   }
+  },
+  "aggregations": {
+    "categories_found": {
+      "terms": {
+       "field": "category",
+       "size": 100
+   }
+  }
+ }
+}
+```
 #### The must Clause
+```
+GET news_headlines/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+        "match_phrase": {
+          "headline": "Michelle Obama"
+         }
+        },
+        {
+          "match": {
+            "category": "POLITICS"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+Expected response from Elasticsearch: 
+![image](https://user-images.githubusercontent.com/60980933/108541719-0807e100-72a0-11eb-8872-4fa3d121129b.png)
 See Google doc
 Let’s take a look at the must clause. The must clause requires that "anything in here must match." It’s almost like an "and" operator. The queries in the must clause must match in the returned documents. Each query will compute its own score separately and will contribute to the overall score. 
 
@@ -324,6 +423,29 @@ Elastic writes a lot of blogs about product releases, which may not be relevant 
 With these types of queries, Elasticsearch will search across two fields. Both match queries must be satisfied for a document to be returned as a hit. This means that having more queries in your must clause will increase the precision of your query. The score will be computed for both clauses and then added together. 
 
 #### The must_not Clause
+```
+GET news_headlines/_search
+{
+  "query": {
+    "bool": {
+      "must": {
+        "match_phrase": {
+          "headline": "Michelle Obama"
+         }
+        },
+        "must_not":[
+         {
+          "match_phrase": {
+            "category": "WEDDINGS"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+Expected:
+![image](https://user-images.githubusercontent.com/60980933/108543691-a137f700-72a2-11eb-93d1-2dfae56096d8.png)
 
 See google doc
 The must_not clause is used to exclude information. The clause (query) must not appear in the matching documents. Since the term does not appear in the documents, all returned documents have a score of 0. In fact, the scoring algorithm is skipped altogether.
@@ -333,11 +455,74 @@ The previous query for "Logstash" and "Engineering" cast a narrow net; it is too
 The previous query does not cast a wide net for "Logstash." It might be better not to search for blogs in the category "Releases."
 
 #### The should Clause
+
+```
+GET news_headlines/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+        "match_phrase": {
+          "headline": "Michelle Obama"
+          }
+         }
+        ],
+        "should":[
+         {
+          "match_phrase": {
+            "category": "BLACK VOICES"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+Expected response: 
+![image](https://user-images.githubusercontent.com/60980933/108544983-7058c180-72a4-11eb-8adc-0433592ef9a9.png)
+Black history month- when people search for Michelle obama, more likely to be related to the category Black Voices rather than parenting or style.  perhaps we should prioritize
+
 A should clause does not exclude documents. The queries in the should clause should appear in the matching document, and if it does, the score of that document will increase so that the document will return earlier in hits. 
 
 Let’s say you are looking for blogs about the "Elastic Stack" preferably from "Shay Banon." The query will return all blogs about the Elastic Stack, and those documents authored by Shay Banon will come back first.
 
 This should clause does not add more hits, but blogs written by Shay score the highest.
+
+#### Filter Clause
+```
+GET news_headlines/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+        "match_phrase": {
+          "headline": "Michelle Obama"
+          }
+         }
+        ],
+        "filter":{
+          "range":{
+             "date": {
+               "lt": "2016-03-25"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+The filter clause will exclude some results, so does it actually match? Filter clauses should be a yes/no question if you want to use this clause and no scores will be calculated.
+
+Let’s say you want to find blogs about the "Elastic Stack" published before 2017.
+
+You want to place your range query on the publish date field into a filter clause. Dates are either in (yes) or not in (no) any date range. Run the range query on its own and you’ll find that all the documents that are returned have a score of 1 (yes). This score was actually computed for every document that matched, which is a waste of computation time. Place queries like this range query in a filter clause and the scoring algorithm will be skipped for that query.
+
+The filter clause will strip away any hits that do not match the filter.
+Expected: 
+![image](https://user-images.githubusercontent.com/60980933/108546105-e6a9f380-72a5-11eb-8983-f4718e95140e.png)
 
 #### Query vs Filter
 You have seen query contexts, but there is another clause known as a filter context:
@@ -356,14 +541,6 @@ To recap, must, must_not, and filter clauses all have the ability to include or 
 
 The filter and must_not do not contribute to the score of the documents while must and should do.
 
-#### The filter clause
-The filter clause will exclude some results, so does it actually match? Filter clauses should be a yes/no question if you want to use this clause and no scores will be calculated.
-
-Let’s say you want to find blogs about the "Elastic Stack" published before 2017.
-
-You want to place your range query on the publish date field into a filter clause. Dates are either in (yes) or not in (no) any date range. Run the range query on its own and you’ll find that all the documents that are returned have a score of 1 (yes). This score was actually computed for every document that matched, which is a waste of computation time. Place queries like this range query in a filter clause and the scoring algorithm will be skipped for that query.
-
-The filter clause will strip away any hits that do not match the filter.
 
 #### Improving relevance 
 
@@ -373,6 +550,25 @@ many should clauses
 Suppose you run a search for a blogs with “Elastic” in the title field and you want to favor blogs that mention “stack,” “speed,” or “query.” Let’s add a few queries in the should clause.  Review the example below. 
 
 This will cast a wide net because none of the queries in the should clause need to match. 
+```
+GET news_headlines/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match_phrase": {"headline": "Michelle Obama"}}
+        ],
+        "should":[
+          {"match": {"headline": "Becoming"}},
+          {"match": {"headline": "women"}},
+          {"match": {"headline": "empower"}}
+      ]
+    }
+  }
+}
+```
+Expected:
+![image](https://user-images.githubusercontent.com/60980933/108548611-51a8f980-72a9-11eb-8310-0fe14286e437.png)
 
 use minimum_should_match
 –
@@ -381,6 +577,28 @@ You can also improve relevance by having multiple should clauses together with a
 
 
 This query returns documents that match the query in the must clause and at least one of the queries in the should clause.
+```
+GET news_headlines/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match_phrase": {"headline": "Michelle Obama"}}
+        ],
+        "should":[
+          {"match": {"headline": "Becoming"}},
+          {"match": {"headline": "women"}},
+          {"match": {"headline": "empower"}}
+      ],
+      "minimum_should_match": 1
+    }
+  }
+}
+```
+
+Expected: 
+![image](https://user-images.githubusercontent.com/60980933/108549645-aac55d00-72aa-11eb-9337-e49bb46531c2.png)
+![image](https://user-images.githubusercontent.com/60980933/108549665-b44ec500-72aa-11eb-9c33-bd186827b110.png)
 
 only should clauses
 If you have a bool query with no queries in the must or filter clause, one or more queries in the should clause must match. This means that the minimum_should_match defaults to 1 when your query does not have a must or filter clause. (If your query does have a must or filter clause, minimum_should_match defaults to 0).
