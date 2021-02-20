@@ -126,7 +126,6 @@ Elasticsearch returns greater than 10,000 hits. The top hit as well as many othe
 When the `match query` is used to search for a phrase, it has high recall but low precision as it returns a lot of loosely related documents.
 
 #### Searching for phrases using the `match_phrase` query
-
 Syntax: 
 ```
 GET enter_name_of_index_here/_search
@@ -166,7 +165,7 @@ With match_phrase parameter, we get 3 hits returned. All 3 hits satisfy the crit
 
 With the match_phrase parameter, you get higher precision but lower recall. 
 
-#### Running a match query against multiple fields 
+### Running a match query against multiple fields 
 
 Syntax:
 ```
@@ -190,7 +189,7 @@ GET news_headlines/_search
 {
   "query": {
     "multi_match": {
-      "query":"michelle obama",
+      "query":"Michelle Obama",
       "fields": [
         "headline",
         "short_description",
@@ -202,15 +201,15 @@ GET news_headlines/_search
 
 ```
 Expected response from Elasticsearch:
-We see 3044 hits that contain "michelle obama" in the headline or short_description or author field. But you will see that this hit came up even though michelle obama was not the main topic of the article. 
+
+We see 3044 hits that contain "Michelle Obama" in the headline or short_description or author field. But you will see that this hit came up even though Michelle Obama was not the main topic of the article. 
 
 ![image](https://user-images.githubusercontent.com/60980933/108424827-e9014480-71f6-11eb-90f5-f7276aebbd0d.png)
 
-
 #### Per-field boosting
-Boost is one other dial to use for better search results.  Let’s say you want the blog’s title to carry more weight than the content or author fields. Review the example below to learn how you can do this.
+What if you want the article's headline to carry more weight than short_description or author fields? 
 
-You can boost the score of the title field using the carat(^) symbol.
+You can boost the score of the headline field using the carat(^) symbol.
 Syntax:
 ```
 GET Enter_the_name_of_the_index_here/_search
@@ -247,10 +246,10 @@ Expected response from Elasticsearch:
 
 ![image](https://user-images.githubusercontent.com/60980933/108425052-2fef3a00-71f7-11eb-8bf1-8c13d6a0a37c.png)
 
-Yields same number of hits(3044) but the order of the hits have changed. The hits ranking higher on the list has Michelle Obama in the boosted field, headline. The articles are definitely about Michelle Obama!
+Yields same number of hits(3044) but the order of the hits have changed. The hits ranking higher on the list has Michelle Obama in the boosted field, headline. These articles are definitely about Michelle Obama!
 
 #### Let's try searching for a Topic
-What if you are looking for an article that mentions "Party planning"? This query contains the popular term "party" or "planning?, so you will see a lot of hits. 
+While searching for Michelle Obama, the user just remembered she is throwing a party for all of her friends this weekend. She searches for articles regarding party planning to get some ideas for it. 
 
 ```
 GET news_headlines/_search
@@ -267,11 +266,11 @@ GET news_headlines/_search
 }
 ```
 Response from Elasticsearch:
-Why do you think there are so many hits? 
-So many hits were returned because the multi_match query performs a match query (with the default "or" logic) on multiple fields. The word "elasticsearch" occurs frequently in the Elastic blogs so naturally, there are a lot of hits.
-![image](https://user-images.githubusercontent.com/60980933/108427330-39c66c80-71fa-11eb-9019-5c274754acad.png)
+This query yields a lot of hits(2846). This happens because multi_match query performs a match query in multiple fields. The terms "party" or "planning" are popular terms. If any one of these search terms appear in any of these fields in any way shape or form, the document will be considered as a hit. Because of that, you will see irrelevant search results included among the hits as well. 
 
-#### Improving Precision with match_phrase
+![image](https://user-images.githubusercontent.com/60980933/108582689-09fa9000-72f2-11eb-8e34-8f6cc4302254.png)
+
+#### Improving Precision with phrase type match. 
 See google drive
 The top hits returned are good, but the precision is not great. Let’s search for the phrase "elasticsearch training" instead. You can improve precision by performing a phrase type match (the default type is best_fields). The phrase type performs a match_phrase query on each field and selects the best score.
 
@@ -309,19 +308,15 @@ GET news_headlines/_search
 }
 ```
 Expected response from Elasticsearch:
-![image](https://user-images.githubusercontent.com/60980933/108427545-92960500-71fa-11eb-99f3-8e8b6d2f446d.png)
 
-** Add poll questions: True or false
-The match_phrase query can be used for searching for multiple terms that are near each other
-The multi_match query allows you to search for the same terms in multiple fields
-Fuzziness is an easy solution to deal with misspelling but has high CPU overhead and very low precision
+The recall is much lower(6 hits vs 2846) but every one of the hits have the phrase party planning in either headline or short_description field. The hits that have phrase party planning in boosted field headline is ranked higher in the search results. 
 
-I also like the end of the section questions. Incorporate this somehow. 
+![image](https://user-images.githubusercontent.com/60980933/108582734-4ded9500-72f2-11eb-856b-611cc81e11bf.png)
 
 
 ### Combined Queries
 
-Suppose you want to write a query to answer the following request: 
+While 
 
 "Find blogs about the "Elastic Stack" published before 2017"  
 
