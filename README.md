@@ -26,16 +26,16 @@ Workshop objectives:
 
 ## Review from Workshop Part 2
 There are two main ways to search in Elasticsearch:
-1) `Queries`retrieve documents that match the criteria. 
-2) `Aggregations` summarize your data as metrics, statistics, and other analytics.  
+1) `Queries`retrieve documents that match the specified criteria. 
+2) `Aggregations` present the summary of your data as metrics, statistics, and other analytics.  
 
 ### Search queries
 #### Get information about documents in an index
-The following query will retrieve all documents that exist in the specified index. 
+The following query will retrieve all documents that exist in the specified index. This query is a great way to explore the structure and content of your document. 
 
 Syntax: 
 ```
-GET enter_name_of_the_index_here/_search
+GET Enter_name_of_the_index_here/_search
 ```
 Example: 
 ```
@@ -51,7 +51,7 @@ Elasticsearch displays a number of hits and a sample of 10 search results by def
 #### Analyze the data to show the categories of news headlines in our dataset
 Syntax:
 ```
-GET enter_name_of_the_index_here/_search
+GET Enter_name_of_the_index_here/_search
 {
   "aggs": {
     "name your aggregation here": {
@@ -79,6 +79,8 @@ GET news_headlines/_search
 ```
 Expected response from Elasticsearch:
 
+When you minimize hits(line 10), you will see the aggregations report. This report displays all categories that exist in our datset as well as the number of documents that fall under each category. 
+
 ![image](https://user-images.githubusercontent.com/60980933/105434428-cc361900-5c18-11eb-9db7-e7441ac5a1ac.png)
 
 ## Full Text Queries
@@ -88,7 +90,7 @@ Expected response from Elasticsearch:
 
 Syntax:
 ```
-GET enter_name_of_index_here/_search
+GET Enter_name_of_index_here/_search
 {
   "query": {
     "match": {
@@ -99,7 +101,6 @@ GET enter_name_of_index_here/_search
  }
 }
 ```
-
 ###  Searching for a phrase
 #### What happens when you use the `match query` to search for phrases?
 Let's search for articles about Ed Sheeran's song "Shape of you" using the match query.
@@ -119,16 +120,16 @@ GET news_headlines/_search
 ```
 Expected response from Elasticsearch:
 
-![image](https://user-images.githubusercontent.com/60980933/108571746-17058800-72ce-11eb-8b44-57df1cbb35d1.png)
-
 Elasticsearch returns greater than 10,000 hits. The top hit as well as many others in the search results only contain the search terms "you" and "shape". These terms are not found in the same order or proximity to each other as the search query "Shape of you".  Along with a few articles about the song "Shape of you", it pulls up articles about being in shape or what shape of your face says about you. 
 
 When the `match query` is used to search for a phrase, it has high recall but low precision as it returns a lot of loosely related documents.
 
+![image](https://user-images.githubusercontent.com/60980933/108571746-17058800-72ce-11eb-8b44-57df1cbb35d1.png)
+
 #### Searching for phrases using the `match_phrase` query
 Syntax: 
 ```
-GET enter_name_of_index_here/_search
+GET Enter_name_of_index_here/_search
 {
   "query": {
     "match_phrase": {
@@ -152,20 +153,25 @@ GET news_headlines/_search
  }
 }
 ```
-When the match_phrase parameter is used, all hits returned must meet the following criteria:
-1. the search terms "Shape", "of", and "you" must appear in the headline field
-2. the terms must appear in that order
-3. the terms must appear next to each other
+When the `match_phrase` parameter is used, all hits returned must meet the following criteria:
+1. the search terms "Shape", "of", and "you" must appear in the headline field.
+2. the terms must appear in that order.
+3. the terms must appear next to each other.
 
 Expected response from Elasticsearch:
 
-With match_phrase parameter, we get 3 hits returned. All 3 hits satisfy the criteria mentiond above. 
+With `match_phrase` parameter, we get 3 hits returned. All 3 hits satisfy the criteria mentioned above. 
+
+The `match_phrase` parameter yields higher precision but lower recall. 
 
 ![image](https://user-images.githubusercontent.com/60980933/108422566-f537d280-71f3-11eb-8340-2899b5fbc61e.png)
 
-With the match_phrase parameter, you get higher precision but lower recall. 
-
 ### Running a match query against multiple fields 
+When designing a query, you do not always know the context of user's search. When a user searches for "Michelle Obama", the user could be searching for statements written by Michelle Obama or articles related to her. 
+
+To accommodate these contexts, you can write a query designed search for terms in multiple fields.
+
+This query runs a match query on each field and calculates a score for each field. Then it assigns the highest score among the fields to the document. 
 
 Syntax:
 ```
@@ -183,7 +189,8 @@ GET Enter_the_name_of_the_index_here/_search
   }
 }
 ````
-Example:
+Example: Find the search terms "Michelle" and "Obama" in the headline, short_description, and author fields. 
+
 ```
 GET news_headlines/_search
 {
@@ -198,18 +205,22 @@ GET news_headlines/_search
     }
   }
 }
-
 ```
 Expected response from Elasticsearch:
 
-We see 3044 hits that contain "Michelle Obama" in the headline or short_description or author field. But you will see that this hit came up even though Michelle Obama was not the main topic of the article. 
+We see 3044 hits that contain "Michelle Obama" in the headline or short_description or author field. While the multi_match query increased the recall, it decreased the precision of the hits. 
 
-![image](https://user-images.githubusercontent.com/60980933/108424827-e9014480-71f6-11eb-90f5-f7276aebbd0d.png)
+An article featuring Bernie Sanders as the main topic is pulled up as a top hit for a search regarding Michelle Obama. In this article, Michelle Obama is mentioned once in the short description. 
+
+![image](https://user-images.githubusercontent.com/60980933/108615076-902fd880-73bd-11eb-97a8-9e600bb5952b.png)
 
 #### Per-field boosting
-What if you want the article's headline to carry more weight than short_description or author fields? 
+Articles mentioning "Michelle Obama" in the headline are more likely to be related in our search than the articles that mention "Michelle Obama" once or twice in the short_description. 
 
-You can boost the score of the headline field using the carat(^) symbol.
+To improve the precision of your search, you can designate one field to carry more weight more than others. 
+
+This can be done by boosting the score of the field headline using the carat(^) symbol.
+
 Syntax:
 ```
 GET Enter_the_name_of_the_index_here/_search
@@ -243,14 +254,15 @@ GET news_headlines/_search
 }
 ```
 Expected response from Elasticsearch:
+`Per-field boosting` yields same number of hits(3044). However, it changed the ranking of the hits. The hits ranked higher on the list have Michelle Obama in the boosted field, headline. 
+
+These articles are more likely to be about Michelle Obama and we have improved the precision of our search!
 
 ![image](https://user-images.githubusercontent.com/60980933/108425052-2fef3a00-71f7-11eb-8bf1-8c13d6a0a37c.png)
 
-Yields same number of hits(3044) but the order of the hits have changed. The hits ranking higher on the list has Michelle Obama in the boosted field, headline. These articles are definitely about Michelle Obama!
+#### What happens when you use the `multi_match` query to search for a phrase?
 
-#### Let's try searching for a Topic
-While searching for Michelle Obama, the user just remembered she is throwing a party for all of her friends this weekend. She searches for articles regarding party planning to get some ideas for it. 
-
+While searching for Michelle Obama, the user remembers that she is throwing a party for all of her friends this weekend. She searches for articles regarding party planning to get some ideas for it. 
 ```
 GET news_headlines/_search
 {
@@ -266,13 +278,15 @@ GET news_headlines/_search
 }
 ```
 Response from Elasticsearch:
-This query yields a lot of hits(2846). This happens because multi_match query performs a match query in multiple fields. The terms "party" or "planning" are popular terms. If any one of these search terms appear in any of these fields in any way shape or form, the document will be considered as a hit. Because of that, you will see irrelevant search results included among the hits as well. 
+
+This query yields a lot of hits(2846). This happens because the terms "party" or "planning" are popular terms. With the `multi_match query`, a document is considered as a hit if any one of these search terms were found in any of these fields in any way shape or form. Because of this wide net, you will see irrelevant search results included among the hits. 
 
 ![image](https://user-images.githubusercontent.com/60980933/108582689-09fa9000-72f2-11eb-8e34-8f6cc4302254.png)
 
-#### Improving Precision with phrase type match. 
-See google drive
-The top hits returned are good, but the precision is not great. Let’s search for the phrase "elasticsearch training" instead. You can improve precision by performing a phrase type match (the default type is best_fields). The phrase type performs a match_phrase query on each field and selects the best score.
+#### Improving precision with phrase type match
+ 
+You can improve the precision of a `multi_match query` by adding a phrase type match in the query. 
+The phrase type performs a match_phrase query on each field and calculates a score for each field. Then it assigns the best score to the document. 
 
 Syntax:
 ```
@@ -291,7 +305,7 @@ GET Enter_the_name_of_the_index_here/_search
   }
 }
 ```
-Example:
+Example: Look up the phrase "party planning" in the fields headline and short_description. Assign a higher score to documents containing the phrase "party planning" in the headline field. 
 ```
 GET news_headlines/_search
 {
@@ -309,68 +323,25 @@ GET news_headlines/_search
 ```
 Expected response from Elasticsearch:
 
-The recall is much lower(6 hits vs 2846) but every one of the hits have the phrase party planning in either headline or short_description field. The hits that have phrase party planning in boosted field headline is ranked higher in the search results. 
+The recall is much lower(6 vs 2846 hits) but every one of the hits have the phrase party planning in either the headline or short_description field or both. Among these, the hits that have phrase party planning in the boosted field headline are ranked higher in the search results. 
 
-![image](https://user-images.githubusercontent.com/60980933/108582734-4ded9500-72f2-11eb-856b-611cc81e11bf.png)
+![image](https://user-images.githubusercontent.com/60980933/108615437-4943e200-73c1-11eb-87ac-881b6a20d962.png)
 
-### Combined Queries
- 
-"Find articles about "Michelle Obama" and her political initiatives published before the year 2016"  
+## Combined Queries
+
+There will be times when a user asks a question that must be answered by multiple queries. 
+
+For example, a user may want to find political articles about Michelle Obama published before the year 2016.  
 
 This search is actually a combination of three queries:
 
-Search for "Michelle Obama" in the short_description or headline fields. 
-The articles must be from the "POLITICS" category. 
-The date field nees to be set before the year 2016
+1) Query articles that contain "Michelle Obama" in the headline field. 
+2) Query Michelle Obama articles from the "POLITICS" category. 
+3) Query Michelle Obama articles published before the year 2016
 
 You can combine these three queries by using the bool query.
 
-#### A combination of query and aggregation request
-To understand what type of questions we can ask about Michelle Obama, we need to first understand what articles have been written about her. 
-
-One way to understand that is by searching for categories of articles that mention Michelle Obama. 
-
-Syntax:
-```
-GET Enter_name_of_the_index_here/_search
-{
-  "query": {
-    "Enter match or match_phrase here": { "Enter the name of the field": "Enter the value you are looking for" }
-  },
-  "aggregations": {
-    "Name your aggregation here": {
-      "Specify aggregation type here": {
-        "field": "Name the field you want to aggregate here",
-        "size": State how many buckets you want returned here
-      }
-    }
-  }
-}
-```
-Example:
-```
-GET news_headlines/_search
-{
-  "query": {
-    "match_phrase": { 
-      "headline": "Michelle Obama"
-   }
-  },
-  "aggregations": {
-    "category_mentions": {
-      "terms": {
-       "field": "category",
-       "size": 100
-   }
-  }
- }
-}
-```
-Expected reponse from Elasticsearch:
-
-![image](https://user-images.githubusercontent.com/60980933/108541130-5668b000-729f-11eb-80aa-8e37b6dc016c.png)
-
-#### Bool Query
+### Bool Query
 The [bool query](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-bool-query.html#:~:text=Bool%20Queryedit,clause%20with%20a%20typed%20occurrence.) is a query that matches documents matching boolean combinations of other queries. 
 
 There are four clauses to choose from: 
@@ -406,6 +377,57 @@ GET name_of_index/_search
   }
 }
 ```
+#### A combination of query and aggregation request
+Bool query can help you answer multi-faceted questions. 
+
+To understand what type of questions we can ask about Michelle Obama, we need to first understand what articles have been written about her. 
+
+One way to understand that is by searching for categories of articles that mention Michelle Obama. 
+
+Syntax:
+```
+GET Enter_name_of_the_index_here/_search
+{
+  "query": {
+    "Enter match or match_phrase here": { "Enter the name of the field": "Enter the value you are looking for" }
+  },
+  "aggregations": {
+    "Name your aggregation here": {
+      "Specify aggregation type here": {
+        "field": "Name the field you want to aggregate here",
+        "size": State how many buckets you want returned here
+      }
+    }
+  }
+}
+```
+Example: Query all data that has the phrase "Michelle Obama" in the headline. Then perform aggregations on the queried data and extract all categories that exist in the queried data. 
+```
+GET news_headlines/_search
+{
+  "query": {
+    "match_phrase": { 
+      "headline": "Michelle Obama"
+   }
+  },
+  "aggregations": {
+    "category_mentions": {
+      "terms": {
+       "field": "category",
+       "size": 100
+   }
+  }
+ }
+}
+```
+Expected reponse from Elasticsearch:
+
+When you minimize hits field(line 10), you will see the aggregations report called category_mentions. This report displays an array of all the categories that exist in the queried data and the number of articles that are written under each category. 
+
+We see that Michelle Obama has been written about multiple topics such as politics, style, parenting, taste, and even weddings! 
+
+![image](https://user-images.githubusercontent.com/60980933/108541130-5668b000-729f-11eb-80aa-8e37b6dc016c.png)
+
 #### The must clause
 The must clause defines all the criteria(queries) a document MUST meet to be returned as search results. These criteria are expressed in forms of one or multiple queries. All queries in the must clause must be satisfied for a document to be returned as a hit. As a result, having more queries in the must clause will increase the precision of your query. 
 
