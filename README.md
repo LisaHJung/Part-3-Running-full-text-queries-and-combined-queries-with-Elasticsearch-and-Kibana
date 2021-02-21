@@ -12,7 +12,7 @@ Workshop objectives:
 
 ## Resources
 
-[Beginner's Crash Course Table of Contents](https://github.com/LisaHJung/Beginners-Crash-Course-to-the-Elastic-Stack-Series) Interested in other workshops of this series? Check out the table of contents.
+[Beginner's Crash Course Table of Contents](https://github.com/LisaHJung/Beginners-Crash-Course-to-the-Elastic-Stack-Series): Interested in other workshops in this series? Check out the table of contents.
 
 [Free Elastic Cloud Trial](https://ela.st/elastic-beginners)
 
@@ -22,12 +22,12 @@ Workshop objectives:
 
 [Dataset](https://www.kaggle.com/rmisra/news-category-dataset) from Kaggle used for workshop
 
-[Elastic America Virtual Chapter](https://community.elastic.co/amer-virtual/) Want to attend live workshops? Join the Elastic Vancouver Chapter to get the deets!
+[Elastic America Virtual Chapter](https://community.elastic.co/amer-virtual/): Want to attend live workshops? Join the Elastic Americal Virtual Chapter to get the deets!
 
 ## Review from Workshop Part 2
 There are two main ways to search in Elasticsearch:
-1) Queries: Queries retrieve documents that match the criteria. 
-2) Aggregations: An aggregation summarizes your data as metrics, statistics, and other analytics.  
+1) `Queries`retrieve documents that match the criteria. 
+2) `Aggregations` summarize your data as metrics, statistics, and other analytics.  
 
 ### Search queries
 #### Get information about documents in an index
