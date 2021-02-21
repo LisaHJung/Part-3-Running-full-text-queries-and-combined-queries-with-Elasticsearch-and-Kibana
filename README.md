@@ -329,7 +329,7 @@ The recall is much lower(6 vs 2846 hits) but every one of the hits have the phra
 
 ## Combined Queries
 
-There will be times when a user asks a question that must be answered by multiple queries. 
+There will be times when a user asks a multifaceted question that requires multiple queries to answer. 
 
 For example, a user may want to find political articles about Michelle Obama published before the year 2016.  
 
@@ -351,7 +351,7 @@ There are four clauses to choose from:
 4)filter
 
 You can build combinations of one or more of these clauses.
-Under each clause, you can specify the criteria of each clause via including one or multiple queries.
+Each clause can contain one or multiple queries that specify the criteria of each clause. 
 
 These clauses are optional and can be mixed and matched to cater to your use case. The order in which they appear does not matter either! 
 
@@ -362,16 +362,16 @@ GET name_of_index/_search
   "query": {
     "bool": {
       "must": [
-        {Enter one or more queries(criteria) a document must match to be considered as a hit}
+        {A document must match one or more queries specified here to be considered as a hit}
       ],
       "must_not": [
-        {Enter one or more queries(criteria) that must match for a document to be considred as a hit.}
+        {A document must NOT match any of the queries specified here. It it does, it is excluded from the search results. }
       ],
       "should": [
-        {Enter criteria that are not mandatory, but given a higher score.}
+        {A document does not have to match any queries specified here. However, it if it does match, the document is given a higher score.}
       ],
       "filter": [
-        {Enter yes or no filter(queries) that strips away any hits that do not match the filter }
+        {These filters(queries) places documents in either yes or no categories. Ones that fall into no category are excluded from the search results }
       ]
     }
   }
@@ -422,16 +422,17 @@ GET news_headlines/_search
 ```
 Expected reponse from Elasticsearch:
 
-When you minimize hits field(line 10), you will see the aggregations report called category_mentions. This report displays an array of all the categories that exist in the queried data and the number of articles that are written under each category. 
+When you minimize hits field(line 10), you will see an aggregations report called category_mentions. This report displays an array of all the categories that exist in the queried data and the number of articles that have been written about each category. 
 
-We see that Michelle Obama has been written about multiple topics such as politics, style, parenting, taste, and even weddings! 
+We see that Michelle Obama has been written about diverse topics such as politics, black voices, parenting, taste, and even weddings! 
 
 ![image](https://user-images.githubusercontent.com/60980933/108541130-5668b000-729f-11eb-80aa-8e37b6dc016c.png)
 
 #### The must clause
-The must clause defines all the criteria(queries) a document MUST meet to be returned as search results. These criteria are expressed in forms of one or multiple queries. All queries in the must clause must be satisfied for a document to be returned as a hit. As a result, having more queries in the must clause will increase the precision of your query. 
+The must clause defines all the queries(criteria) a document MUST match to be returned as hits. These criteria are expressed in the form of one or multiple queries. All queries in the must clause must be satisfied for a document to be returned as a hit. As a result, having more queries in the must clause will increase the precision of your query. 
 
 The `must clause` examines how well a document matches the query. Therefore, a score is computed for each query and then added together to calculate the overall score of a hit.  
+
 Syntax:
 ```
 GET Enter_name_of_the_index_here/_search
@@ -440,12 +441,12 @@ GET Enter_name_of_the_index_here/_search
     "bool": {
       "must": [
         {
-        "Enter match or match_phrase here: {
+        "Enter match or match_phrase here": {
           "Enter the name of the field": "Enter the value you are looking for" 
          }
         },
         {
-          "match": {
+          "Enter match or match_phrase here": {
             "Enter the name of the field": "Enter the value you are looking for" 
           }
         }
@@ -479,14 +480,37 @@ GET news_headlines/_search
 ```
 Expected response from Elasticsearch: 
 
-You will get 45 hits. All documents will contain Michelle Obama in the headline field and POLITICS in the category field. 
-![image](https://user-images.githubusercontent.com/60980933/108541719-0807e100-72a0-11eb-8872-4fa3d121129b.png)
+You will get 45 hits. All documents will contain "Michelle Obama in the headline" field and "POLITICS" in the category field. 
+![image](https://user-images.githubusercontent.com/60980933/108631596-cbff8800-7427-11eb-9ac0-2f172075f9ed.png)
 
 #### The must_not clause
-The must_not clause defines disqualifying characterics of a document that must not be included in the search results. These disqualifying characteristics are expressed in the form of one or multiple queries. 
+The must_not clause defines queries(criteria) a document MUST NOT meet to be included in the search results. 
 
-The must_not clause focuses on whether the document does(yes) or does not(no) contain characteristics that would disqualify them from being included in the search results. Therefore, it does not contribute to the overall scoring of the hits. 
+The must_not clause only focuses on whether the document does(yes) or does not(no) match queries that would disqualify them from being included in the search results. In Elasticsearch, any query that determines whether the document matches the query in a yes or no fashion, scoring is skipped. 
 
+Syntax:
+```
+GET Enter_name_of_the_index_here/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+        "Enter match or match_phrase here: {
+          "Enter the name of the field": "Enter the value you are looking for" 
+         }
+        },
+        "must_not":[
+         {
+          "Enter match or match_phrase here": {
+            "Enter the name of the field": "Enter the value you are looking for"
+          }
+        }
+      ]
+    }
+  }
+}
+```
 Example: All hits MUST contain Michelle Obama in the headline field. Documents MUST NOT contain the term weddings in the category field. 
 
 ```
@@ -511,14 +535,38 @@ GET news_headlines/_search
 }
 ```
 Expected response from Elasticsearch:
-This query will improve our recall and yield 203 search results. This query will pull up all hits that contain Michelle Obama in the headline field and exclude all documents that has the term "WEDDINGS" in the category field.
 
-![image](https://user-images.githubusercontent.com/60980933/108543691-a137f700-72a2-11eb-93d1-2dfae56096d8.png)
+This query increases the recall(203 hits). This query pulls up all hits that contain "Michelle Obama" in the headline field. Among the hits, Elasticsearch excludes all documents that has the term "WEDDINGS" in the category field.
+
+![image](https://user-images.githubusercontent.com/60980933/108631753-99a25a80-7428-11eb-819a-c284e0ebb1b1.png)
 
 #### The should clause
-The should clause adds "nice to have" criteria. The documents do not need to meet these "nice to have" criteria to be considered as hits. However, the ones that do will be given a higher score so it shows up higher in the search results. 
+The should clause adds "nice to have" queries(criteria). The documents do not need to match the "nice to have" queries to be considered as hits. However, the ones that do will be given a higher score so it shows up higher in the search results. 
 
-Example: During the Black History Month, users are most likely to look up Michelle Obama in the context of Black Voices category rather than in the context of weddings, parenting, or style categories. 
+Syntax:
+```
+GET Enter_name_of_the_index_here/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+        "Enter match or match_phrase here: {
+          "Enter the name of the field": "Enter the value you are looking for" 
+         }
+        },
+        "should":[
+         {
+          "Enter match or match_phrase here": {
+            "Enter the name of the field": "Enter the value you are looking for"
+          }
+        }
+      ]
+    }
+  }
+```
+
+Example: During the Black History Month, the users are more likely to look up Michelle Obama in the context of Black Voices category rather than in the context of weddings, parenting, or style categories. 
 
 All hits MUST contain Michelle Obama in the headline field. Having the phrase "BLACK VOICES" in the category is not required. However, if a document contains the phrase "BLACK VOICES" in the category field, then assign a higher score to that document so that it is shown higher in the search results.
 
@@ -546,16 +594,47 @@ GET news_headlines/_search
 }
 ```
 Expected response: 
-We should still get 207 hits as a should clause does not add or exclude more hits. However, the ranking of the documents have been changed. The documents with "BLACK VOICES" in the category field are now at the top of the search results. 
 
-![image](https://user-images.githubusercontent.com/60980933/108544983-7058c180-72a4-11eb-8adc-0433592ef9a9.png)
+We should still get same number of hits(207) as the should clause does not add or exclude more hits. However, you will notice that the ranking of the documents has been changed. The documents with "BLACK VOICES" in the category field are now presented towards the top of the search results. 
+
+![image](https://user-images.githubusercontent.com/60980933/108632370-be4c0180-742b-11eb-8c03-75c7809b54b8.png)
 
 #### Filter Clause
-The filter clauses places hits in either yes or no category. For example, if you are looking for an article written in certain time range, some hits will fall within this range(yes) or do not fall within this range(no). 
+The filter clause contains filter queries that place documents in either "yes" or "no" category. 
 
-The filter clause will strip away any hits that fall in the no category. As the filter clause only focuses on whether the hits fall into yes or no category, the filter clause do not contribute to calculating a score for hits.
+For example, let's say you are looking for an article written in certain time range. Some documents will fall within this range(yes) or do not fall within this range(no). 
 
-Example: All hits must include the phrase "Michelle Obama" in the headline. Among these hits, exclude all the documents that have been written after 2016-03-25. 
+The filter clause excludes any documents that fall in the no category. 
+
+As the filter clause only focuses on whether the hits fall into yes or no category, the filter clause do not contribute to calculating a score for hits.
+
+Syntax:
+```
+GET Enter_name_of_the_index_here/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+        "Enter match or match_phrase here: {
+          "Enter the name of the field": "Enter the value you are looking for" 
+         }
+        }
+        ],
+        "filter":{
+          "range":{
+             "date": {
+               "gte": "Enter lowest value of the range here",
+               "lte": "Enter highest value of the range here"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Example: All hits must include the phrase "Michelle Obama" in the headline. Among these hits, exclude any documents that have not published between the date range "2014-03-25" and "2016-03-25".
 ```
 GET news_headlines/_search
 {
@@ -571,7 +650,8 @@ GET news_headlines/_search
         "filter":{
           "range":{
              "date": {
-               "lt": "2016-03-25"
+               "gte": "2014-03-25",
+               "lte": "2016-03-25"
           }
         }
       }
@@ -580,17 +660,42 @@ GET news_headlines/_search
 }
 ```
 Expected response from Elasticsearch: 
-You will see 147 hits returned. All hits have been written before 2016-03-25 specified under the filter clause.
-![image](https://user-images.githubusercontent.com/60980933/108546105-e6a9f380-72a5-11eb-8983-f4718e95140e.png)
+You will see 33 hits returned. All hits have been published between the date range we specified under the filter clause.  
+![image](https://user-images.githubusercontent.com/60980933/108633174-15ec6c00-7430-11eb-9153-05d849673f3a.png)
 
 #### Improving relevance 
+Here are neat tips and tricks to fine tune precision and scoring within your bool queries! 
 
-You can control much of precision and scoring within your bool queries. The following section contains tips for how to control and improve the precision of your hits as well as some clever uses of the should clause to cast a wide net and also have high precision by making use of rankings. 
+**many should clauses**
+`many should clauses` are used when you want to cast a wide net and while favoring precision at the same time. 
 
-many should clauses
-Suppose you run a search for a blogs with “Elastic” in the title field and you want to favor blogs that mention “stack,” “speed,” or “query.” Let’s add a few queries in the should clause.  Review the example below. 
+Syntax:
+```
+GET Enter_name_of_the_index_here/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"Enter match or match_phrase here": {"Enter the name of the field": "Enter the value you are looking for"}}
+        ],
+        "should":[
+          {"Enter match or match_phrase here": {"Enter the name of the field": "Enter the value you are looking for"}},
+          {"Enter match or match_phrase here": {"Enter the name of the field": "Enter the value you are looking for"}},
+          {"Enter match or match_phrase here": {"Enter the name of the field": "Enter the value you are looking for"}}
+      ]
+    }
+  }
+}
+```
+Example: Let's say you want to run a search for articles with the phrase "Michelle Obama" in the headline field. But you want to favor articles that mention her biography "Becoming", and terms like "women" and "empower". 
 
-This will cast a wide net because none of the queries in the should clause need to match. 
+To do this, you can add multiple queries in the `should clause`. 
+
+This will cast a wide net because none of the queries in the should clause need to match. However, the ones that match the queries under the should clause will be given a higher score.  
+
+This approach ensures to maintain high recall but also gives you a way to present more precise search results towards the top. 
+
+Example:
 ```
 GET news_headlines/_search
 {
@@ -608,16 +713,39 @@ GET news_headlines/_search
   }
 }
 ```
-Expected:
+Expected response from Elasticsearch:
+Adding `many should clauses` did not reduce the number of hits(207). However, it favored documents that match the queries in the `should` clause, giving the user more precise search results. 
+
 ![image](https://user-images.githubusercontent.com/60980933/108548611-51a8f980-72a9-11eb-8310-0fe14286e437.png)
 
-use minimum_should_match
-–
-You can also improve relevance by having multiple should clauses together with a minimum_should_match parameter. With this optional parameter, you can require that one or more queries in the should clause match. Let’s improve precision by requiring at least one of the three queries in the should clause to match.
+**minimum_should_match**
+What if you wanted to increase the precision of `multiple should clauses` search results? 
 
+You can add the `minimum_should_match` parameter! 
 
+This parameter requires that one or more queries in the `should clause` must match.  What happens when we require that at least one of the three queries in the should clause to match? 
 
-This query returns documents that match the query in the must clause and at least one of the queries in the should clause.
+Syntax:
+```
+GET Enter_name_of_the_index_here/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"Enter match or match_phrase here": {"Enter the name of the field": "Enter the value you are looking for"}}
+        ],
+        "should":[
+          {"Enter match or match_phrase here": {"Enter the name of the field": "Enter the value you are looking for"}},
+          {"Enter match or match_phrase here": {"Enter the name of the field": "Enter the value you are looking for"}},
+          {"Enter match or match_phrase here": {"Enter the name of the field": "Enter the value you are looking for"}}
+      ],
+      "minimum_should_match": "Enter how many of the queries under the should clause must be matched"
+    }
+  }
+}
+```
+
+Example:This query returns documents that match the query in the must clause and at least one of the queries in the should clause.
 ```
 GET news_headlines/_search
 {
@@ -636,23 +764,48 @@ GET news_headlines/_search
   }
 }
 ```
+Expected response from Elasticsearch:
 
-Expected: 
+The recall has significantly gone down(2 vs 207). However, all hits in the search results contain the phrase "Michelle Obama" in the headline and contain either the term "Becoming" or "Women" in the headline. 
+
 ![image](https://user-images.githubusercontent.com/60980933/108549645-aac55d00-72aa-11eb-9337-e49bb46531c2.png)
 ![image](https://user-images.githubusercontent.com/60980933/108549665-b44ec500-72aa-11eb-9c33-bd186827b110.png)
 
-only should clauses
+**only should clauses**
+While the previous queries in this repo have always included the `must clause` in the bool query, it is not necessary to have `must` or `filter` clause. There will be times where you want to cast a wide net as possible yet favor documents to show up as top hits based on criteria specified under the should clause. 
+
+This can be accomplished by setting up a bool query with:
+
+1)no queries in the must or filter clause
+
+2)adding multiple should queries under the `should clause`
+
+When the bool query set up this way, Elasticsearch mandates that one or more queries in the should clause must match, meaning the minimum_should_match parameter defaults to 1. 
+
 If you have a bool query with no queries in the must or filter clause, one or more queries in the should clause must match. This means that the minimum_should_match defaults to 1 when your query does not have a must or filter clause. (If your query does have a must or filter clause, minimum_should_match defaults to 0).
 
-"should not" query
+Example: I am interested in learning more about general articles written about women empowerment. 
+```
+GET news_headlines/_search
+{
+  "query": {
+    "bool": {
+        "should":[
+          {"match": {"headline": "women"}},
+          {"match": {"headline": "empower"}}
+      ]
+    }
+  }
+}
+```
+Expected response from Elasticsearch: 
+
+**"should not" query**
+What if you want to keep the high recall but want to improve precision by having low precision documents at the lower end of the search results? 
 
 There is no built-in "should not" clause. But you can still build a query that negatively impacts the score by combining bool queries. The following example implements a “should not” logic. Notice that bool queries can be nested. 
 
-
-
-   “Find blogs that contain “elastic”, but I prefer blogs that do not contain “stack.” 
-
-
+“Find blogs that contain “elastic”, but I prefer blogs that do not contain “stack.” 
 
 You cast a wider net here by not filtering out “stack”, but you improve the precision by adding to the scores of the documents that do not contain “stack”. 
 
@@ -668,4 +821,4 @@ You can improve the precision of this query by using a match_phrase query. You c
 
 In the example below, you keep the high recall of the match query using the “or” logic and also improve the precision by reordering the results to return the high precision documents first. Notice you get the same 852 hits, but the score is higher for documents in which the phrase "open data" appears.
 
-- Add other ways to query Elasticsearch, KQL, and SQL if I need more content
+
