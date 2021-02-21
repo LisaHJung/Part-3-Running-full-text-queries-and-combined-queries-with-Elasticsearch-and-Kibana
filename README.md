@@ -313,48 +313,41 @@ The recall is much lower(6 hits vs 2846) but every one of the hits have the phra
 
 ![image](https://user-images.githubusercontent.com/60980933/108582734-4ded9500-72f2-11eb-856b-611cc81e11bf.png)
 
-
 ### Combined Queries
+ 
+"Find articles about "Michelle Obama" and her political initiatives published before the year 2016"  
 
-While 
+This search is actually a combination of three queries:
 
-"Find blogs about the "Elastic Stack" published before 2017"  
+Search for "Michelle Obama" in the short_description or headline fields. 
+The articles must be from the "POLITICS" category. 
+The date field nees to be set before the year 2016
 
-This search is actually a combination of two queries:
+You can combine these three queries by using the bool query.
 
-Search for "Elastic Stack" in the content or title field
-The publish_date field needs to be before 2017
-You can combine these two queries by using the bool query.
+#### A combination of query and aggregation request
+To understand what type of questions we can ask about Michelle Obama, we need to first understand what articles have been written about her. 
 
-#### Bool Query
-A bool query is a query that matches documents matching boolean combinations of other queries. There are four clauses to choose from: must, must_not, should, and filter. You can build combinations of one or more queries by including them in one or more of these clauses. You will take a look at each clause to understand the differences between them. 
-
-Each of the following clauses are possible (but optional) in a bool query and they can appear in any order. The order doesn't matter because the clauses will be internally reordered based on their respective costs. Take a moment to review the syntax below.
+One way to understand that is by searching for categories of articles that mention Michelle Obama. 
 
 Syntax:
 ```
-GET name_of_index/_search
+GET Enter_name_of_the_index_here/_search
 {
   "query": {
-    "bool": {
-      "must": [
-        {}
-      ],
-      "must_not": [
-        {}
-      ],
-      "should": [
-        {}
-      ],
-      "filter": [
-        {}
-      ]
+    "Enter match or match_phrase here": { "Enter the name of the field": "Enter the value you are looking for" }
+  },
+  "aggregations": {
+    "Name your aggregation here": {
+      "Specify aggregation type here": {
+        "field": "Name the field you want to aggregate here",
+        "size": State how many buckets you want returned here
+      }
     }
   }
 }
 ```
-Find what categories Michelle Obama is found. 
-![image](https://user-images.githubusercontent.com/60980933/108541130-5668b000-729f-11eb-80aa-8e37b6dc016c.png)
+Example:
 ```
 GET news_headlines/_search
 {
@@ -364,7 +357,7 @@ GET news_headlines/_search
    }
   },
   "aggregations": {
-    "categories_found": {
+    "category_mentions": {
       "terms": {
        "field": "category",
        "size": 100
@@ -373,7 +366,74 @@ GET news_headlines/_search
  }
 }
 ```
-#### The must Clause
+Expected reponse from Elasticsearch:
+
+![image](https://user-images.githubusercontent.com/60980933/108541130-5668b000-729f-11eb-80aa-8e37b6dc016c.png)
+
+#### Bool Query
+The [bool query](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-bool-query.html#:~:text=Bool%20Queryedit,clause%20with%20a%20typed%20occurrence.) is a query that matches documents matching boolean combinations of other queries. 
+
+There are four clauses to choose from: 
+1)must
+2)must_not
+3)should 
+4)filter
+
+You can build combinations of one or more of these clauses.
+Under each clause, you can specify the criteria of each clause via including one or multiple queries.
+
+These clauses are optional and can be mixed and matched to cater to your use case. The order in which they appear does not matter either! 
+
+Syntax:
+```
+GET name_of_index/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {Enter one or more queries(criteria) a document must match to be considered as a hit}
+      ],
+      "must_not": [
+        {Enter one or more queries(criteria) that must match for a document to be considred as a hit.}
+      ],
+      "should": [
+        {Enter criteria that are not mandatory, but given a higher score.}
+      ],
+      "filter": [
+        {Enter yes or no filter(queries) that strips away any hits that do not match the filter }
+      ]
+    }
+  }
+}
+```
+#### The must clause
+The must clause defines all the criteria(queries) a document MUST meet to be returned as search results. These criteria are expressed in forms of one or multiple queries. All queries in the must clause must be satisfied for a document to be returned as a hit. As a result, having more queries in the must clause will increase the precision of your query. 
+
+The `must clause` examines how well a document matches the query. Therefore, a score is computed for each query and then added together to calculate the overall score of a hit.  
+Syntax:
+```
+GET Enter_name_of_the_index_here/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+        "Enter match or match_phrase here: {
+          "Enter the name of the field": "Enter the value you are looking for" 
+         }
+        },
+        {
+          "match": {
+            "Enter the name of the field": "Enter the value you are looking for" 
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+Example:
 ```
 GET news_headlines/_search
 {
@@ -396,15 +456,17 @@ GET news_headlines/_search
 }
 ```
 Expected response from Elasticsearch: 
+
+You will get 45 hits. All documents will contain Michelle Obama in the headline field and POLITICS in the category field. 
 ![image](https://user-images.githubusercontent.com/60980933/108541719-0807e100-72a0-11eb-8872-4fa3d121129b.png)
-See Google doc
-Let’s take a look at the must clause. The must clause requires that "anything in here must match." It’s almost like an "and" operator. The queries in the must clause must match in the returned documents. Each query will compute its own score separately and will contribute to the overall score. 
 
-Elastic writes a lot of blogs about product releases, which may not be relevant if you are looking for technical details. Let’s search for "Logstash" only in the "Engineering" category.
+#### The must_not clause
+The must_not clause defines disqualifying characterics of a document that must not be included in the search results. These disqualifying characteristics are expressed in the form of one or multiple queries. 
 
-With these types of queries, Elasticsearch will search across two fields. Both match queries must be satisfied for a document to be returned as a hit. This means that having more queries in your must clause will increase the precision of your query. The score will be computed for both clauses and then added together. 
+The must_not clause focuses on whether the document does(yes) or does not(no) contain characteristics that would disqualify them from being included in the search results. Therefore, it does not contribute to the overall scoring of the hits. 
 
-#### The must_not Clause
+Example: All hits MUST contain Michelle Obama in the headline field. Documents MUST NOT contain the term weddings in the category field. 
+
 ```
 GET news_headlines/_search
 {
@@ -417,7 +479,7 @@ GET news_headlines/_search
         },
         "must_not":[
          {
-          "match_phrase": {
+          "match": {
             "category": "WEDDINGS"
           }
         }
@@ -426,17 +488,17 @@ GET news_headlines/_search
   }
 }
 ```
-Expected:
+Expected response from Elasticsearch:
+This query will improve our recall and yield 203 search results. This query will pull up all hits that contain Michelle Obama in the headline field and exclude all documents that has the term "WEDDINGS" in the category field.
+
 ![image](https://user-images.githubusercontent.com/60980933/108543691-a137f700-72a2-11eb-93d1-2dfae56096d8.png)
 
-See google doc
-The must_not clause is used to exclude information. The clause (query) must not appear in the matching documents. Since the term does not appear in the documents, all returned documents have a score of 0. In fact, the scoring algorithm is skipped altogether.
+#### The should clause
+The should clause adds "nice to have" criteria. The documents do not need to meet these "nice to have" criteria to be considered as hits. However, the ones that do will be given a higher score so it shows up higher in the search results. 
 
-The previous query for "Logstash" and "Engineering" cast a narrow net; it is too precise. You may see better results, with more recall, by  searching for blogs not in the category "Releases."
+Example: During the Black History Month, users are most likely to look up Michelle Obama in the context of Black Voices category rather than in the context of weddings, parenting, or style categories. 
 
-The previous query does not cast a wide net for "Logstash." It might be better not to search for blogs in the category "Releases."
-
-#### The should Clause
+All hits MUST contain Michelle Obama in the headline field. Having the phrase "BLACK VOICES" in the category is not required. However, if a document contains the phrase "BLACK VOICES" in the category field, then assign a higher score to that document so that it is shown higher in the search results.
 
 ```
 GET news_headlines/_search
@@ -462,16 +524,16 @@ GET news_headlines/_search
 }
 ```
 Expected response: 
+We should still get 207 hits as a should clause does not add or exclude more hits. However, the ranking of the documents have been changed. The documents with "BLACK VOICES" in the category field are now at the top of the search results. 
+
 ![image](https://user-images.githubusercontent.com/60980933/108544983-7058c180-72a4-11eb-8adc-0433592ef9a9.png)
-Black history month- when people search for Michelle obama, more likely to be related to the category Black Voices rather than parenting or style.  perhaps we should prioritize
-
-A should clause does not exclude documents. The queries in the should clause should appear in the matching document, and if it does, the score of that document will increase so that the document will return earlier in hits. 
-
-Let’s say you are looking for blogs about the "Elastic Stack" preferably from "Shay Banon." The query will return all blogs about the Elastic Stack, and those documents authored by Shay Banon will come back first.
-
-This should clause does not add more hits, but blogs written by Shay score the highest.
 
 #### Filter Clause
+The filter clauses places hits in either yes or no category. For example, if you are looking for an article written in certain time range, some hits will fall within this range(yes) or do not fall within this range(no). 
+
+The filter clause will strip away any hits that fall in the no category. As the filter clause only focuses on whether the hits fall into yes or no category, the filter clause do not contribute to calculating a score for hits.
+
+Example: All hits must include the phrase "Michelle Obama" in the headline. Among these hits, exclude all the documents that have been written after 2016-03-25. 
 ```
 GET news_headlines/_search
 {
@@ -495,34 +557,9 @@ GET news_headlines/_search
   }
 }
 ```
-
-The filter clause will exclude some results, so does it actually match? Filter clauses should be a yes/no question if you want to use this clause and no scores will be calculated.
-
-Let’s say you want to find blogs about the "Elastic Stack" published before 2017.
-
-You want to place your range query on the publish date field into a filter clause. Dates are either in (yes) or not in (no) any date range. Run the range query on its own and you’ll find that all the documents that are returned have a score of 1 (yes). This score was actually computed for every document that matched, which is a waste of computation time. Place queries like this range query in a filter clause and the scoring algorithm will be skipped for that query.
-
-The filter clause will strip away any hits that do not match the filter.
-Expected: 
+Expected response from Elasticsearch: 
+You will see 147 hits returned. All hits have been written before 2016-03-25 specified under the filter clause.
 ![image](https://user-images.githubusercontent.com/60980933/108546105-e6a9f380-72a5-11eb-8983-f4718e95140e.png)
-
-#### Query vs Filter
-You have seen query contexts, but there is another clause known as a filter context:
-
-Query context: results in a _score
-Filter context: results in a "yes" or "no"
-If you want to know how well the document matches the query, use the query context. If you don’t care about the score and only want to know if the document matches the query, use the filter context.
-
-Queries that are placed in a filter clause or must_not clause are in a filter context. This means that scoring is skipped, and also become candidates for caching. You can learn more about caching in module 3 of Elasticsearch Engineer II. 
-
-see Google doc
-
-#### The bool Query: Clauses Recap
-
-To recap, must, must_not, and filter clauses all have the ability to include or exclude documents to be part of the result set. Should, on the other hand, does not (by default) include or exclude documents from the result set. There are however some exceptions to this rule, and you will learn about this later on.
-
-The filter and must_not do not contribute to the score of the documents while must and should do.
-
 
 #### Improving relevance 
 
