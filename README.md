@@ -43,7 +43,7 @@ GET news_headlines/_search
 ```
 Expected response from Elasticsearch:
 
-Elasticsearch displays a number of hits and a sample of 10 search results by default.  
+Elasticsearch displays a number of hits and a sample of 10 search results by default.  The field "_ source"(line 22) lists all fields or content of the document.
 
 ![image](https://user-images.githubusercontent.com/60980933/105432767-8c216700-5c15-11eb-9ea2-ef74a3bc5f1b.png)
 
@@ -54,10 +54,10 @@ Syntax:
 GET Enter_name_of_the_index_here/_search
 {
   "aggs": {
-    "name your aggregation here": {
-      "specify aggregation type here": {
-        "field": "name the field you want to aggregate here",
-        "size": state how many buckets you want returned here
+    "Name your aggregation here": {
+      "Specify aggregation type here": {
+        "field": "Name the field you want to aggregate here",
+        "size": State how many buckets you want returned here
       }
     }
   }
@@ -79,14 +79,14 @@ GET news_headlines/_search
 ```
 Expected response from Elasticsearch:
 
-When you minimize hits(line 10), you will see the aggregations report. This report displays all categories that exist in our datset as well as the number of documents that fall under each category. 
+When you minimize hits(line 10), you will see the aggregations report we named by_category. This report displays all categories that exist in our datset as well as the number of documents that fall under each category. 
 
 ![image](https://user-images.githubusercontent.com/60980933/105434428-cc361900-5c18-11eb-9db7-e7441ac5a1ac.png)
 
 ## Full Text Queries
 ### Searching for search terms
 
-`match query` is a standard query for performing a full text search. This query retrieves documents that contain the search terms in any way, shape or form. The order and the proximity in which the search terms are found(i.e. phrases) are not considered as a priority. 
+The `match query` is a standard query for performing a full text search. This query retrieves documents that contain the search terms in any way, shape or form. The order and the proximity in which the search terms are found(i.e. phrases) are not considered as a priority. 
 
 Syntax:
 ```
@@ -215,7 +215,7 @@ An article featuring Bernie Sanders as the main topic is pulled up as a top hit 
 ![image](https://user-images.githubusercontent.com/60980933/108615076-902fd880-73bd-11eb-97a8-9e600bb5952b.png)
 
 #### Per-field boosting
-Articles mentioning "Michelle Obama" in the headline are more likely to be related in our search than the articles that mention "Michelle Obama" once or twice in the short_description. 
+Articles mentioning "Michelle Obama" in the headline are more likely to be related to our search than the articles that mention "Michelle Obama" once or twice in the short_description. 
 
 To improve the precision of your search, you can designate one field to carry more weight more than others. 
 
@@ -254,6 +254,7 @@ GET news_headlines/_search
 }
 ```
 Expected response from Elasticsearch:
+
 `Per-field boosting` yields same number of hits(3044). However, it changed the ranking of the hits. The hits ranked higher on the list have Michelle Obama in the boosted field, headline. 
 
 These articles are more likely to be about Michelle Obama and we have improved the precision of our search!
@@ -323,7 +324,7 @@ GET news_headlines/_search
 ```
 Expected response from Elasticsearch:
 
-The recall is much lower(6 vs 2846 hits) but every one of the hits have the phrase party planning in either the headline or short_description field or both. Among these, the hits that have phrase party planning in the boosted field headline are ranked higher in the search results. 
+The recall is much lower(6 vs 2846 hits) but every one of the hits have the phrase party planning in either the headline or short_description field or both. Among these, the hits that have the phrase party planning in the boosted field headline are ranked higher in the search results. 
 
 ![image](https://user-images.githubusercontent.com/60980933/108615437-4943e200-73c1-11eb-87ac-881b6a20d962.png)
 
@@ -339,16 +340,17 @@ This search is actually a combination of three queries:
 2) Query Michelle Obama articles from the "POLITICS" category. 
 3) Query Michelle Obama articles published before the year 2016
 
-You can combine these three queries by using the bool query.
+One of the ways you can combine these queries is through a `bool query`.
 
 ### Bool Query
 The [bool query](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-bool-query.html#:~:text=Bool%20Queryedit,clause%20with%20a%20typed%20occurrence.) is a query that matches documents matching boolean combinations of other queries. 
 
 There are four clauses to choose from: 
-1)must
-2)must_not
-3)should 
-4)filter
+
+1. must
+2. must_not
+3. should 
+4. filter
 
 You can build combinations of one or more of these clauses.
 Each clause can contain one or multiple queries that specify the criteria of each clause. 
@@ -362,16 +364,16 @@ GET name_of_index/_search
   "query": {
     "bool": {
       "must": [
-        {A document must match one or more queries specified here to be considered as a hit}
+        {One or more queries can be specified here. A document MUST match all of these queries to be considered as a hit}
       ],
       "must_not": [
         {A document must NOT match any of the queries specified here. It it does, it is excluded from the search results. }
       ],
       "should": [
-        {A document does not have to match any queries specified here. However, it if it does match, the document is given a higher score.}
+        {A document does not have to match any queries specified here. However, it if it does match, this document is given a higher score.}
       ],
       "filter": [
-        {These filters(queries) places documents in either yes or no categories. Ones that fall into no category are excluded from the search results }
+        {These filters(queries) place documents in either yes or no category. Ones that fall into the no category are excluded from the search results }
       ]
     }
   }
@@ -429,7 +431,7 @@ We see that Michelle Obama has been written about diverse topics such as politic
 ![image](https://user-images.githubusercontent.com/60980933/108541130-5668b000-729f-11eb-80aa-8e37b6dc016c.png)
 
 #### The must clause
-The must clause defines all the queries(criteria) a document MUST match to be returned as hits. These criteria are expressed in the form of one or multiple queries. All queries in the must clause must be satisfied for a document to be returned as a hit. As a result, having more queries in the must clause will increase the precision of your query. 
+The `must clause` defines all the queries(criteria) a document MUST match to be returned as hits. These criteria are expressed in the form of one or multiple queries. All queries in the must clause must be satisfied for a document to be returned as a hit. As a result, having more queries in the `must clause` will increase the precision of your query. 
 
 The `must clause` examines how well a document matches the query. Therefore, a score is computed for each query and then added together to calculate the overall score of a hit.  
 
@@ -480,13 +482,13 @@ GET news_headlines/_search
 ```
 Expected response from Elasticsearch: 
 
-You will get 45 hits. All documents will contain "Michelle Obama in the headline" field and "POLITICS" in the category field. 
+You will get 45 hits. All documents will contain "Michelle Obama" in the headline field and "POLITICS" in the category field. 
 ![image](https://user-images.githubusercontent.com/60980933/108631596-cbff8800-7427-11eb-9ac0-2f172075f9ed.png)
 
 #### The must_not clause
-The must_not clause defines queries(criteria) a document MUST NOT meet to be included in the search results. 
+The `must_not` clause defines queries(criteria) a document MUST NOT match to be included in the search results. 
 
-The must_not clause only focuses on whether the document does(yes) or does not(no) match queries that would disqualify them from being included in the search results. In Elasticsearch, any query that determines whether the document matches the query in a yes or no fashion, scoring is skipped. 
+The `must_not` clause only focuses on whether the document does(yes) or does not(no) match queries that would disqualify them from being included in the search results. In Elasticsearch, any query that determines whether the document matches the query in a yes or no fashion, scoring is skipped. 
 
 Syntax:
 ```
@@ -496,7 +498,7 @@ GET Enter_name_of_the_index_here/_search
     "bool": {
       "must": [
         {
-        "Enter match or match_phrase here: {
+        "Enter match or match_phrase here": {
           "Enter the name of the field": "Enter the value you are looking for" 
          }
         },
@@ -511,7 +513,7 @@ GET Enter_name_of_the_index_here/_search
   }
 }
 ```
-Example: All hits MUST contain Michelle Obama in the headline field. Documents MUST NOT contain the term weddings in the category field. 
+Example: All hits `must` contain Michelle Obama in the headline field. Documents `must_not` contain the term weddings in the category field. 
 
 ```
 GET news_headlines/_search
@@ -541,7 +543,7 @@ This query increases the recall(203 hits). This query pulls up all hits that con
 ![image](https://user-images.githubusercontent.com/60980933/108631753-99a25a80-7428-11eb-819a-c284e0ebb1b1.png)
 
 #### The should clause
-The should clause adds "nice to have" queries(criteria). The documents do not need to match the "nice to have" queries to be considered as hits. However, the ones that do will be given a higher score so it shows up higher in the search results. 
+The `should` clause adds "nice to have" queries(criteria). The documents do not need to match the "nice to have" queries to be considered as hits. However, the ones that do will be given a higher score so it shows up higher in the search results. 
 
 Syntax:
 ```
@@ -566,7 +568,7 @@ GET Enter_name_of_the_index_here/_search
   }
 ```
 
-Example: During the Black History Month, the users are more likely to look up Michelle Obama in the context of Black Voices category rather than in the context of weddings, parenting, or style categories. 
+Example: During the Black History Month, the users are more likely to look up Michelle Obama in the context of "BLACK VOICES" category rather than in the context of "WEDDINGS", "PARENTS", or "STYLE" categories. 
 
 All hits MUST contain Michelle Obama in the headline field. Having the phrase "BLACK VOICES" in the category is not required. However, if a document contains the phrase "BLACK VOICES" in the category field, then assign a higher score to that document so that it is shown higher in the search results.
 
@@ -599,14 +601,14 @@ We should still get same number of hits(207) as the should clause does not add o
 
 ![image](https://user-images.githubusercontent.com/60980933/108632370-be4c0180-742b-11eb-8c03-75c7809b54b8.png)
 
-#### Filter Clause
-The filter clause contains filter queries that place documents in either "yes" or "no" category. 
+#### The filter clause
+The `filter clause` contains filter queries that place documents in either "yes" or "no" category. 
 
 For example, let's say you are looking for an article written in certain time range. Some documents will fall within this range(yes) or do not fall within this range(no). 
 
 The filter clause excludes any documents that fall in the no category. 
 
-As the filter clause only focuses on whether the hits fall into yes or no category, the filter clause do not contribute to calculating a score for hits.
+As the filter clause only focuses on whether the hits fall into yes or no category, the filter clause do not contribute to calculating the score for hits.
 
 Syntax:
 ```
@@ -616,7 +618,7 @@ GET Enter_name_of_the_index_here/_search
     "bool": {
       "must": [
         {
-        "Enter match or match_phrase here: {
+        "Enter match or match_phrase here": {
           "Enter the name of the field": "Enter the value you are looking for" 
          }
         }
@@ -660,11 +662,12 @@ GET news_headlines/_search
 }
 ```
 Expected response from Elasticsearch: 
+
 You will see 33 hits returned. All hits have been published between the date range we specified under the filter clause.  
 ![image](https://user-images.githubusercontent.com/60980933/108633174-15ec6c00-7430-11eb-9153-05d849673f3a.png)
 
-#### Improving relevance 
-Here are neat tips and tricks to fine tune precision and scoring within your bool queries! 
+#### Fine-tuning the relevance of bool queries
+Here are tips and tricks to fine-tune the precision and scoring within your bool queries! 
 
 **many should clauses**
 `many should clauses` are used when you want to cast a wide net and while favoring precision at the same time. 
