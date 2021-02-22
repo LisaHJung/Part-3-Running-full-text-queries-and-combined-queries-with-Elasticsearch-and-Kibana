@@ -502,7 +502,7 @@ GET Enter_name_of_the_index_here/_search
           "Enter the name of the field": "Enter the value you are looking for" 
          }
         },
-        "must_not":[
+       "must_not":[
          {
           "Enter match or match_phrase here": {
             "Enter the name of the field": "Enter the value you are looking for"
@@ -525,7 +525,7 @@ GET news_headlines/_search
           "headline": "Michelle Obama"
          }
         },
-        "must_not":[
+       "must_not":[
          {
           "match": {
             "category": "WEDDINGS"
@@ -557,7 +557,7 @@ GET Enter_name_of_the_index_here/_search
           "Enter the name of the field": "Enter the value you are looking for" 
          }
         },
-        "should":[
+       "should":[
          {
           "Enter match or match_phrase here": {
             "Enter the name of the field": "Enter the value you are looking for"
@@ -584,7 +584,7 @@ GET news_headlines/_search
           }
          }
         ],
-        "should":[
+       "should":[
          {
           "match_phrase": {
             "category": "BLACK VOICES"
@@ -623,7 +623,7 @@ GET Enter_name_of_the_index_here/_search
          }
         }
         ],
-        "filter":{
+       "filter":{
           "range":{
              "date": {
                "gte": "Enter lowest value of the range here",
@@ -649,7 +649,7 @@ GET news_headlines/_search
           }
          }
         ],
-        "filter":{
+       "filter":{
           "range":{
              "date": {
                "gte": "2014-03-25",
@@ -681,7 +681,7 @@ GET Enter_name_of_the_index_here/_search
       "must": [
         {"Enter match or match_phrase here": {"Enter the name of the field": "Enter the value you are looking for"}}
         ],
-        "should":[
+       "should":[
           {"Enter match or match_phrase here": {"Enter the name of the field": "Enter the value you are looking for"}},
           {"Enter match or match_phrase here": {"Enter the name of the field": "Enter the value you are looking for"}},
           {"Enter match or match_phrase here": {"Enter the name of the field": "Enter the value you are looking for"}}
@@ -707,7 +707,7 @@ GET news_headlines/_search
       "must": [
         {"match_phrase": {"headline": "Michelle Obama"}}
         ],
-        "should":[
+       "should":[
           {"match": {"headline": "Becoming"}},
           {"match": {"headline": "women"}},
           {"match": {"headline": "empower"}}
@@ -757,7 +757,7 @@ GET news_headlines/_search
       "must": [
         {"match_phrase": {"headline": "Michelle Obama"}}
         ],
-        "should":[
+       "should":[
           {"match": {"headline": "Becoming"}},
           {"match": {"headline": "women"}},
           {"match": {"headline": "empower"}}
