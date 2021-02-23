@@ -200,7 +200,7 @@ GET news_headlines/_search
       "fields": [
         "headline",
         "short_description",
-        "author"
+        "authors"
         ]
     }
   }
@@ -212,7 +212,7 @@ We see 3044 hits that contain "Michelle Obama" in the headline or short_descript
 
 An article featuring Bernie Sanders as the main topic is pulled up as a top hit for a search regarding Michelle Obama. In this article, Michelle Obama is mentioned once in the short description. 
 
-![image](https://user-images.githubusercontent.com/60980933/108875750-bb334b80-75ba-11eb-823b-a7adfc07fcf6.png)
+![image](https://user-images.githubusercontent.com/60980933/108615076-902fd880-73bd-11eb-97a8-9e600bb5952b.png)
 
 #### Per-field boosting
 Articles mentioning "Michelle Obama" in the headline are more likely to be related to our search than the articles that mention "Michelle Obama" once or twice in the short_description. 
@@ -247,7 +247,7 @@ GET news_headlines/_search
       "fields": [
         "headline^2",
         "short_description",
-        "author"
+        "authors"
         ]
     }
   }
@@ -255,11 +255,11 @@ GET news_headlines/_search
 ```
 Expected response from Elasticsearch:
 
-`Per-field boosting` yields same number of hits(3044). However, it changed the ranking of the hits. The hits ranked higher on the list have Michelle Obama in the boosted field, headline. 
+`Per-field boosting` yields same number of hits(5128). However, it changed the ranking of the hits. The hits ranked higher on the list have Michelle Obama in the boosted field, headline. 
 
 These articles are more likely to be about Michelle Obama and we have improved the precision of our search!
 
-![image](https://user-images.githubusercontent.com/60980933/108425052-2fef3a00-71f7-11eb-8bf1-8c13d6a0a37c.png)
+![image](https://user-images.githubusercontent.com/60980933/108877609-a5268a80-75bc-11eb-8f61-ce1d1702a6e0.png)
 
 #### What happens when you use the `multi_match` query to search for a phrase?
 
@@ -380,7 +380,7 @@ GET name_of_index/_search
 }
 ```
 #### A combination of query and aggregation request
-Bool query can help you answer multi-faceted questions. 
+A bool query can help you answer multi-faceted questions. 
 
 To understand what type of questions we can ask about Michelle Obama, we need to first understand what articles have been written about her. 
 
@@ -543,7 +543,7 @@ This query increases the recall(203 hits). This query pulls up all hits that con
 ![image](https://user-images.githubusercontent.com/60980933/108631753-99a25a80-7428-11eb-819a-c284e0ebb1b1.png)
 
 #### The should clause
-The `should` clause adds "nice to have" queries(criteria). The documents do not need to match the "nice to have" queries to be considered as hits. However, the ones that do will be given a higher score so it shows up higher in the search results. 
+The `should clause` adds "nice to have" queries(criteria). The documents do not need to match the "nice to have" queries to be considered as hits. However, the ones that do will be given a higher score so it shows up higher in the search results. 
 
 Syntax:
 ```
@@ -606,9 +606,9 @@ The `filter clause` contains filter queries that place documents in either "yes"
 
 For example, let's say you are looking for an article written in certain time range. Some documents will fall within this range(yes) or do not fall within this range(no). 
 
-The filter clause only includes documents that fall in the yes category. 
+The `filter clause` only includes documents that fall in the yes category. 
 
-The filter clause only focuses on whether the hits fall into yes or no category. It does not focus on how well a document matches the filter query. Thereofre, the filter clause does not contribute to calculating the score for hits.
+The `filter clause` only focuses on whether the hits fall into yes or no category. It does not focus on how well a document matches the filter query. Thereofre, the `filter clause` does not contribute to calculating the score for hits.
 
 Syntax:
 ```
@@ -668,8 +668,8 @@ You will see 33 hits returned. All hits have been published between the date ran
 #### Fine-tuning the relevance of bool queries
 Here are tips and tricks to fine-tune the precision and scoring within your bool queries! 
 
-**many should clauses**
-`many should clauses` are used when you want to cast a wide net and while favoring precision at the same time. 
+**Adding multiple queries under the `should clause`**
+This approach ensures that you maintain a high recall but also offers a way to present more precise search results towards the top.
 
 Syntax:
 ```
@@ -693,9 +693,9 @@ Example: Let's say you want to run a search for articles with the phrase "Michel
 
 To do this, you can add multiple queries in the `should clause`. 
 
-This will cast a wide net because none of the queries in the should clause need to match. However, the ones that match the queries under the should clause will be given a higher score.  
+This will cast a wide net because none of the queries in the `should clause` need to match. However, the ones that match the queries under the `should clause` will be given a higher score.  
 
-This approach ensures to maintain high recall but also gives you a way to present more precise search results towards the top. 
+This approach allows you to maintain a high recall but also gives you a way to customize the precision of top hits. 
 
 Example:
 ```
@@ -716,13 +716,12 @@ GET news_headlines/_search
 }
 ```
 Expected response from Elasticsearch:
-Adding `many should clauses` did not reduce the number of hits(207). However, it favored documents that match the queries in the `should` clause, giving the user more precise search results. 
+Adding many queriesn under the  `should clause` did not reduce the number of hits(207). However, it favored documents that match the queries in the `should` clause, giving the user more precise search results. 
 
 ![image](https://user-images.githubusercontent.com/60980933/108548611-51a8f980-72a9-11eb-8310-0fe14286e437.png)
 
 **minimum_should_match**
-What if you wanted to increase the precision of `multiple should clauses` search results? 
-
+What if you wanted to increase the precision even more when adding multiple queries under the `should clause`?  
 You can add the `minimum_should_match` parameter! 
 
 This parameter requires that one or more queries in the `should clause` must match.  What happens when we require that at least one of the three queries in the should clause to match? 
@@ -772,55 +771,4 @@ The recall has significantly gone down(2 vs 207). However, all hits in the searc
 
 ![image](https://user-images.githubusercontent.com/60980933/108549645-aac55d00-72aa-11eb-9337-e49bb46531c2.png)
 ![image](https://user-images.githubusercontent.com/60980933/108549665-b44ec500-72aa-11eb-9c33-bd186827b110.png)
-
-**only should clauses**
-While the previous queries in this repo have always included the `must clause` in the bool query, it is not necessary to have `must` or `filter` clause. There will be times where you want to cast a wide net as possible yet favor documents to show up as top hits based on criteria specified under the should clause. 
-
-This can be accomplished by setting up a bool query with:
-
-1)no queries in the must or filter clause
-
-2)adding multiple should queries under the `should clause`
-
-When the bool query set up this way, Elasticsearch mandates that one or more queries in the should clause must match, meaning the minimum_should_match parameter defaults to 1. 
-
-If you have a bool query with no queries in the must or filter clause, one or more queries in the should clause must match. This means that the minimum_should_match defaults to 1 when your query does not have a must or filter clause. (If your query does have a must or filter clause, minimum_should_match defaults to 0).
-
-Example: I am interested in learning more about general articles written about women empowerment. 
-```
-GET news_headlines/_search
-{
-  "query": {
-    "bool": {
-        "should":[
-          {"match": {"headline": "women"}},
-          {"match": {"headline": "empower"}}
-      ]
-    }
-  }
-}
-```
-Expected response from Elasticsearch: 
-
-**"should not" query**
-What if you want to keep the high recall but want to improve precision by having low precision documents at the lower end of the search results? 
-
-There is no built-in "should not" clause. But you can still build a query that negatively impacts the score by combining bool queries. The following example implements a “should not” logic. Notice that bool queries can be nested. 
-
-“Find blogs that contain “elastic”, but I prefer blogs that do not contain “stack.” 
-
-You cast a wider net here by not filtering out “stack”, but you improve the precision by adding to the scores of the documents that do not contain “stack”. 
-
-A search tip for phrases
-Let's recall your search for “open data” in the previous lesson. 
-
-Take a moment to review the example below. Notice there are many hits because "open" and "data" are common terms.
-
-Another search tip for phrases
-You can improve the precision of this query by using a match_phrase query. You could also use an “and” operator instead of the default “or” operator to improve the precision. However, both of these options narrow your search results and your recall goes down.
-
-
-
-In the example below, you keep the high recall of the match query using the “or” logic and also improve the precision by reordering the results to return the high precision documents first. Notice you get the same 852 hits, but the score is higher for documents in which the phrase "open data" appears.
-
 
