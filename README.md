@@ -153,7 +153,7 @@ GET news_headlines/_search
  }
 }
 ```
-When the `match_phrase` parameter is used, all hits returned must meet the following criteria:
+When the `match_phrase` parameter is used, all hits must meet the following criteria:
 1. the search terms "Shape", "of", and "you" must appear in the headline field.
 2. the terms must appear in that order.
 3. the terms must appear next to each other.
@@ -243,7 +243,7 @@ GET news_headlines/_search
 {
   "query": {
     "multi_match": {
-      "query":"michelle obama",
+      "query":"Michelle Obama",
       "fields": [
         "headline^2",
         "short_description",
@@ -342,8 +342,8 @@ This search is actually a combination of three queries:
 
 One of the ways you can combine these queries is through a `bool query`.
 
-### Bool Query
-The [bool query](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-bool-query.html#:~:text=Bool%20Queryedit,clause%20with%20a%20typed%20occurrence.) is a query that matches documents matching boolean combinations of other queries. 
+### Boolean Query
+The [boolean query](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-bool-query.html#:~:text=Bool%20Queryedit,clause%20with%20a%20typed%20occurrence.) is a query that matches documents matching boolean combinations of other queries. 
 
 There are four clauses to choose from: 
 
@@ -364,16 +364,16 @@ GET name_of_index/_search
   "query": {
     "bool": {
       "must": [
-        {One or more queries can be specified here. A document MUST match all of these queries to be considered as a hit}
+        {One or more queries can be specified here. A document MUST match all of these queries to be considered as a hit.}
       ],
       "must_not": [
-        {A document must NOT match any of the queries specified here. It it does, it is excluded from the search results. }
+        {A document must NOT match any of the queries specified here. It it does, it is excluded from the search results.}
       ],
       "should": [
         {A document does not have to match any queries specified here. However, it if it does match, this document is given a higher score.}
       ],
       "filter": [
-        {These filters(queries) place documents in either yes or no category. Ones that fall into the no category are excluded from the search results }
+        {These filters(queries) place documents in either yes or no category. Ones that fall into the yes category are included in the hits. }
       ]
     }
   }
@@ -568,9 +568,9 @@ GET Enter_name_of_the_index_here/_search
   }
 ```
 
-Example: During the Black History Month, the users are more likely to look up Michelle Obama in the context of "BLACK VOICES" category rather than in the context of "WEDDINGS", "PARENTS", or "STYLE" categories. 
+Example: During the Black History Month, it is possible that the user is looking up Michelle Obama in the context of "BLACK VOICES" category rather than in the context of "WEDDINGS", "TASTE", or "STYLE" categories. 
 
-All hits MUST contain Michelle Obama in the headline field. Having the phrase "BLACK VOICES" in the category is not required. However, if a document contains the phrase "BLACK VOICES" in the category field, then assign a higher score to that document so that it is shown higher in the search results.
+All hits MUST contain Michelle Obama in the headline field. Having the phrase "BLACK VOICES" in the category is not required. However, if a document contains the phrase "BLACK VOICES" in the category field, this document will be given a higher score and shown higher in the search results.
 
 ```
 GET news_headlines/_search
@@ -606,9 +606,9 @@ The `filter clause` contains filter queries that place documents in either "yes"
 
 For example, let's say you are looking for an article written in certain time range. Some documents will fall within this range(yes) or do not fall within this range(no). 
 
-The filter clause excludes any documents that fall in the no category. 
+The filter clause only includes documents that fall in the yes category. 
 
-As the filter clause only focuses on whether the hits fall into yes or no category, the filter clause do not contribute to calculating the score for hits.
+The filter clause only focuses on whether the hits fall into yes or no category. It does not focus on how well a document matches the filter query. Thereofre, the filter clause does not contribute to calculating the score for hits.
 
 Syntax:
 ```
@@ -635,7 +635,6 @@ GET Enter_name_of_the_index_here/_search
   }
 }
 ```
-
 Example: All hits must include the phrase "Michelle Obama" in the headline. Among these hits, exclude any documents that have not published between the date range "2014-03-25" and "2016-03-25".
 ```
 GET news_headlines/_search
