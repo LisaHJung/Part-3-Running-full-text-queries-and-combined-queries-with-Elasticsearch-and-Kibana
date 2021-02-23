@@ -212,7 +212,7 @@ We see 3044 hits that contain "Michelle Obama" in the headline or short_descript
 
 An article featuring Bernie Sanders as the main topic is pulled up as a top hit for a search regarding Michelle Obama. In this article, Michelle Obama is mentioned once in the short description. 
 
-![image](https://user-images.githubusercontent.com/60980933/108615076-902fd880-73bd-11eb-97a8-9e600bb5952b.png)
+![image](https://user-images.githubusercontent.com/60980933/108875750-bb334b80-75ba-11eb-823b-a7adfc07fcf6.png)
 
 #### Per-field boosting
 Articles mentioning "Michelle Obama" in the headline are more likely to be related to our search than the articles that mention "Michelle Obama" once or twice in the short_description. 
