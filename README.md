@@ -435,8 +435,6 @@ We see that Michelle Obama has been written about diverse topics such as politic
 #### The must clause
 The `must clause` defines all the queries(criteria) a document MUST match to be returned as hits. These criteria are expressed in the form of one or multiple queries. All queries in the must clause must be satisfied for a document to be returned as a hit. As a result, having more queries in the `must clause` will increase the precision of your query. 
 
-The `must clause` examines how well a document matches the query. Therefore, a score is computed for each query and then added together to calculate the overall score of a hit.  
-
 Syntax:
 ```
 GET Enter_name_of_the_index_here/_search
@@ -489,8 +487,6 @@ You will get 45 hits. All documents will contain "Michelle Obama" in the headlin
 
 #### The must_not clause
 The `must_not` clause defines queries(criteria) a document MUST NOT match to be included in the search results. 
-
-The `must_not` clause only focuses on whether the document does(yes) or does not(no) match queries that would disqualify them from being included in the search results. In Elasticsearch, any query that determines whether the document matches the query in a yes or no fashion, scoring is skipped. 
 
 Syntax:
 ```
@@ -718,7 +714,8 @@ GET news_headlines/_search
 }
 ```
 Expected response from Elasticsearch:
-Adding many queriesn under the  `should clause` did not reduce the number of hits(207). However, it favored documents that match the queries in the `should` clause, giving the user more precise search results. 
+
+Adding many queries under the  `should clause` did not reduce the number of hits(207). However, it favored documents that match the queries in the `should` clause, improving the precision of top search results. 
 
 ![image](https://user-images.githubusercontent.com/60980933/108548611-51a8f980-72a9-11eb-8310-0fe14286e437.png)
 
