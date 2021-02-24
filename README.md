@@ -666,7 +666,9 @@ You will see 33 hits returned. All hits have been published between the date ran
 ![image](https://user-images.githubusercontent.com/60980933/108633174-15ec6c00-7430-11eb-9153-05d849673f3a.png)
 
 #### Fine-tuning the relevance of bool queries
-Here are tips and tricks to fine-tune the precision and scoring within your bool queries! 
+
+There are many ways you can fine-tune the relevance of bool queries.
+One of the ways is to add multiple queries under the `should clause`. 
 
 **Adding multiple queries under the `should clause`**
 This approach ensures that you maintain a high recall but also offers a way to present more precise search results towards the top.
