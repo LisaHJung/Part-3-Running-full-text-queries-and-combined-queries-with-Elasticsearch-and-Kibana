@@ -610,8 +610,6 @@ For example, let's say you are looking for an article written in certain time ra
 
 The `filter clause` only includes documents that fall in the yes category. 
 
-The `filter clause` only focuses on whether the hits fall into yes or no category. It does not focus on how well a document matches the filter query. Thereofre, the `filter clause` does not contribute to calculating the score for hits.
-
 Syntax:
 ```
 GET Enter_name_of_the_index_here/_search
