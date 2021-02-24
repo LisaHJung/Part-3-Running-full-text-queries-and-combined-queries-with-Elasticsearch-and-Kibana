@@ -16,6 +16,8 @@ Workshop objectives:
 
 [Free Elastic Cloud Trial](https://ela.st/elastic-beginners)
 
+[Instructions](https://dev.to/lisahjung/beginner-s-guide-to-setting-up-elasticsearch-and-kibana-with-elastic-cloud-1joh) on how to access Elasticsearch and Kibana on Elastic Cloud
+
 [Instructions](https://dev.to/elastic/downloading-elasticsearch-and-kibana-macos-linux-and-windows-1mmo) for downloading Elasticsearch and Kibana
 
 [Presentation]()
@@ -53,7 +55,7 @@ Syntax:
 ```
 GET Enter_name_of_the_index_here/_search
 {
-  "aggs": {
+  "aggregations": {
     "Name your aggregation here": {
       "Specify aggregation type here": {
         "field": "Name the field you want to aggregate here",
@@ -67,7 +69,7 @@ Example:
 ```
 GET news_headlines/_search
 {
-  "aggs": {
+  "aggregations": {
     "by_category": {
       "terms": {
         "field": "category",
@@ -342,8 +344,8 @@ This search is actually a combination of three queries:
 
 One of the ways you can combine these queries is through a `bool query`.
 
-### Boolean Query
-The [boolean query](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-bool-query.html#:~:text=Bool%20Queryedit,clause%20with%20a%20typed%20occurrence.) is a query that matches documents matching boolean combinations of other queries. 
+### Bool Query
+The [bool query](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-bool-query.html#:~:text=Bool%20Queryedit,clause%20with%20a%20typed%20occurrence.) is a query that matches documents matching boolean combinations of other queries. 
 
 There are four clauses to choose from: 
 
