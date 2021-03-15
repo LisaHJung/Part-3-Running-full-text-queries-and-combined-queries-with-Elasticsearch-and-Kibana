@@ -12,7 +12,7 @@ Workshop objectives:
 
 ## Resources
 
-[Beginner's Crash Course Table of Contents](https://github.com/LisaHJung/Beginners-Crash-Course-to-the-Elastic-Stack-Series): Interested in other workshops in this series? Check out the table of contents.
+[Beginner's Crash Course to Elastic Stack Table of Contents](https://github.com/LisaHJung/Beginners-Crash-Course-to-the-Elastic-Stack-Series) This workshop is a part of the Beginner's Crash Course to Elastic Stack series. Check out this table contents to access all the workshops in the series thus far. This table will continue to get updated as more workshops in the series are released! 
 
 [Free Elastic Cloud Trial](https://ela.st/elastic-beginners)
 
