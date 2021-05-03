@@ -20,6 +20,8 @@ Workshop objectives:
 
 [Instructions](https://dev.to/elastic/downloading-elasticsearch-and-kibana-macos-linux-and-windows-1mmo) for downloading Elasticsearch and Kibana
 
+[Video Recording](https://www.youtube.com/watch?v=2KgJ6TQPIIA&t=374s) of the workshop
+
 [Presentation](https://github.com/LisaHJung/Part-3-Running-full-text-queries-and-combined-queries-with-Elasticsearch-and-Kibana/blob/main/Part%203_%20Running%20full%20text%20queries%20and%20combined%20queries%20with%20Elasticsearch%20and%20Kibana.pdf)
 
 [Dataset](https://www.kaggle.com/rmisra/news-category-dataset) from Kaggle used for workshop
