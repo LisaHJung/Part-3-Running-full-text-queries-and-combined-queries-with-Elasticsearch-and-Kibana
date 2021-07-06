@@ -100,11 +100,11 @@ GET Enter_name_of_index_here/_search
 {
   "query": {
     "match": {
-      "Specify the field you want to search":{
-        "query":"Enter search terms"
-   }
+      "Specify the field you want to search": {
+        "query": "Enter search terms"
+      }
+    }
   }
- }
 }
 ```
 ###  Searching for a phrase
@@ -117,11 +117,11 @@ GET news_headlines/_search
 {
   "query": {
     "match": {
-      "headline":{
-        "query":"Shape of you"
-   }
+      "headline": {
+        "query": "Shape of you"
+      }
+    }
   }
- }
 }
 ```
 Expected response from Elasticsearch:
@@ -139,11 +139,11 @@ GET Enter_name_of_index_here/_search
 {
   "query": {
     "match_phrase": {
-      "Specify the field you want to search":{
-        "query":"Enter search terms"
-   }
+      "Specify the field you want to search": {
+        "query": "Enter search terms"
+      }
+    }
   }
- }
 }
 ```
 Example: 
@@ -152,11 +152,11 @@ GET news_headlines/_search
 {
   "query": {
     "match_phrase": {
-      "headline":{
-        "query":"Shape of You"
-   }
+      "headline": {
+        "query": "Shape of You"
+      }
+    }
   }
- }
 }
 ```
 When the `match_phrase` parameter is used, all hits must meet the following criteria:
@@ -185,12 +185,12 @@ GET Enter_the_name_of_the_index_here/_search
 {
   "query": {
     "multi_match": {
-      "query":"Enter search terms here",
+      "query": "Enter search terms here",
       "fields": [
         "List the field you want to search over",
         "List the field you want to search over",
         "List the field you want to search over"
-        ]
+      ]
     }
   }
 }
@@ -202,12 +202,12 @@ GET news_headlines/_search
 {
   "query": {
     "multi_match": {
-      "query":"Michelle Obama",
+      "query": "Michelle Obama",
       "fields": [
         "headline",
         "short_description",
         "authors"
-        ]
+      ]
     }
   }
 }
@@ -233,14 +233,14 @@ GET Enter_the_name_of_the_index_here/_search
 {
   "query": {
     "multi_match": {
-      "query":"Enter search terms",
+      "query": "Enter search terms",
       "fields": [
         "List field you want to boost^2",
         "List field you want to search over",
         "List field you want to search over"
-        ],
+      ]
+    }
   }
- }
 }
 ```
 Example:
@@ -249,12 +249,12 @@ GET news_headlines/_search
 {
   "query": {
     "multi_match": {
-      "query":"Michelle Obama",
+      "query": "Michelle Obama",
       "fields": [
         "headline^2",
         "short_description",
         "authors"
-        ]
+      ]
     }
   }
 }
@@ -275,11 +275,11 @@ GET news_headlines/_search
 {
   "query": {
     "multi_match": {
-      "query":"party planning",
+      "query": "party planning",
       "fields": [
         "headline^2",
         "short_description"
-        ]
+      ]
     }
   }
 }
@@ -301,13 +301,13 @@ GET Enter_the_name_of_the_index_here/_search
 {
   "query": {
     "multi_match": {
-      "query":"Enter search phrase",
+      "query": "Enter search phrase",
       "fields": [
         "List field you want to boost^2",
         "List field you want to search over",
         "List field you want to search over"
-        ],
-        "type": "phrase"
+      ],
+      "type": "phrase"
     }
   }
 }
@@ -318,12 +318,12 @@ GET news_headlines/_search
 {
   "query": {
     "multi_match": {
-      "query":"party planning",
+      "query": "party planning",
       "fields": [
         "headline^2",
         "short_description"
-        ],
-        "type": "phrase"
+      ],
+      "type": "phrase"
     }
   }
 }
@@ -414,18 +414,18 @@ Example: Query all data that has the phrase "Michelle Obama" in the headline. Th
 GET news_headlines/_search
 {
   "query": {
-    "match_phrase": { 
+    "match_phrase": {
       "headline": "Michelle Obama"
-   }
+    }
   },
   "aggregations": {
     "category_mentions": {
       "terms": {
-       "field": "category",
-       "size": 100
-   }
+        "field": "category",
+        "size": 100
+      }
+    }
   }
- }
 }
 ```
 Expected reponse from Elasticsearch:
@@ -680,12 +680,28 @@ GET Enter_name_of_the_index_here/_search
   "query": {
     "bool": {
       "must": [
-        {"Enter match or match_phrase here": {"Enter the name of the field": "Enter the value you are looking for"}}
-        ],
-       "should":[
-          {"Enter match or match_phrase here": {"Enter the name of the field": "Enter the value you are looking for"}},
-          {"Enter match or match_phrase here": {"Enter the name of the field": "Enter the value you are looking for"}},
-          {"Enter match or match_phrase here": {"Enter the name of the field": "Enter the value you are looking for"}}
+        {
+          "Enter match or match_phrase here": {
+            "Enter the name of the field": "Enter the value you are looking for"
+          }
+        }
+      ],
+      "should": [
+        {
+          "Enter match or match_phrase here": {
+            "Enter the name of the field": "Enter the value you are looking for"
+          }
+        },
+        {
+          "Enter match or match_phrase here": {
+            "Enter the name of the field": "Enter the value you are looking for"
+          }
+        },
+        {
+          "Enter match or match_phrase here": {
+            "Enter the name of the field": "Enter the value you are looking for"
+          }
+        }
       ]
     }
   }
@@ -706,12 +722,28 @@ GET news_headlines/_search
   "query": {
     "bool": {
       "must": [
-        {"match_phrase": {"headline": "Michelle Obama"}}
-        ],
-       "should":[
-          {"match": {"headline": "Becoming"}},
-          {"match": {"headline": "women"}},
-          {"match": {"headline": "empower"}}
+        {
+          "match_phrase": {
+            "headline": "Michelle Obama"
+          }
+        }
+      ],
+      "should": [
+        {
+          "match": {
+            "headline": "Becoming"
+          }
+        },
+        {
+          "match": {
+            "headline": "women"
+          }
+        },
+        {
+          "match": {
+            "headline": "empower"
+          }
+        }
       ]
     }
   }
