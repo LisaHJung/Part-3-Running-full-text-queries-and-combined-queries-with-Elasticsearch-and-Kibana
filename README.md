@@ -30,12 +30,12 @@ Workshop objectives:
 
 ## Review from Workshop Part 2
 There are two main ways to search in Elasticsearch:
-1) `Queries`retrieve documents that match the specified criteria. 
+1) `Queries` retrieve documents that match the specified criteria. 
 2) `Aggregations` present the summary of your data as metrics, statistics, and other analytics.  
 
 ### Search queries
 #### Get information about documents in an index
-The following query will retrieve all documents that exist in the specified index. This query is a great way to explore the structure and content of your document. 
+The following `query` will retrieve all documents that exist in the specified index. This `query` is a great way to explore the structure and content of your document. 
 
 Syntax: 
 ```
@@ -90,7 +90,7 @@ When you minimize hits(line 10), you will see the aggregations report we named b
 ## Full Text Queries
 ### Searching for search terms
 
-The `match query` is a standard query for performing a full text search. This query retrieves documents that contain the search terms. It uses "OR" logic by default, meaning that it will retrieve documents that contain any one of the search terms. The order and the proximity in which the search terms are found(i.e. phrases) are not taken into account.
+The `match query` is a standard query for performing a full text search. This `query` retrieves documents that contain the search terms. It uses "OR" logic by default, meaning that it will retrieve documents that contain any one of the search terms. The order and the proximity in which the search terms are found(i.e. phrases) are not taken into account.
 
 Syntax:
 ```
@@ -282,7 +282,7 @@ The documents containing the search terms "Michelle Obama" in the field headline
 
 While searching for Michelle Obama, the user remembers that she is throwing a party for all of her friends this weekend. She searches for news headlines regarding "party planning" to get some ideas for it.
 
-She uses the multi_match query to search for the phrase party planning.
+She uses the `multi_match query` to search for the phrase party planning.
 
 Example:
 ```
@@ -366,11 +366,11 @@ Among these, the hits that have the phrase "party planning" in the boosted field
 
 ## Combined Queries
 
-There will be times when a user asks a multi-faceted question that requires multiple queries to answer.
+There will be times when a user asks a multi-faceted question that requires multiple `queries` to answer.
 
 For example, a user may want to find political headlines about Michelle Obama published before the year 2016.
 
-This search is actually a combination of three queries:
+This search is actually a combination of three `queries`:
 
 1) Query headlines that contain the search terms "Michelle Obama" in the field headline.
 2) Query "Michelle Obama" headlines from the "POLITICS" category.
@@ -379,9 +379,9 @@ This search is actually a combination of three queries:
 One of the ways you can combine these queries is through a `bool query`.
 
 ### Bool Query
-The [bool query](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-bool-query.html#:~:text=Bool%20Queryedit,clause%20with%20a%20typed%20occurrence.) retrieves documents matching boolean combinations of other queries. 
+The [bool query](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-bool-query.html#:~:text=Bool%20Queryedit,clause%20with%20a%20typed%20occurrence.) retrieves documents matching boolean combinations of other `queries`. 
 
-With the `bool query`, you can combine multiple queries into one request and further specify boolean clauses to narrow down your search results.
+With the `bool query`, you can combine multiple `queries` into one request and further specify boolean clauses to narrow down your search results.
 
 There are four clauses to choose from: 
 
@@ -473,14 +473,15 @@ We see that many news headlines about Michelle Obama has been written under cate
 
 **Now let's get back to the bool query!**
 
-With the `bool query`, you can combine multiple queries into one request and further specify boolean clauses to narrow down your search results.
+With the `bool query`, you can combine multiple `queries` into one request and further specify boolean clauses to narrow down your search results.
 
 There are four clauses to choose from:
 
-must
-must_not
-should
-filter
+- must
+- must_not
+- should
+- filter
+
 #### The must clause
 The `must clause` defines all `queries`(criteria) a document MUST match to be returned as hits. These criteria are expressed in the form of one or multiple `queries`.
 
@@ -593,7 +594,7 @@ GET news_headlines/_search
 ```
 Expected response from Elasticsearch:
 
-This query increases the recall(203 hits). It pulls up all the hits that contain the phrase "Michelle Obama" in the field headline. Among the hits, Elasticsearch excludes all documents that contain the term "WEDDINGS" in the field category.
+This `query` increases the recall(203 hits). It pulls up all the hits that contain the phrase "Michelle Obama" in the field headline. Among the hits, Elasticsearch excludes all documents that contain the term "WEDDINGS" in the field category.
 
 ![image](https://user-images.githubusercontent.com/60980933/108631753-99a25a80-7428-11eb-819a-c284e0ebb1b1.png)
 
@@ -730,8 +731,7 @@ All right. Now that we have mastered the `bool query`, let's figure out how we c
 
 #### Fine-tuning the relevance of bool queries
 
-There are many ways you can fine-tune the relevance of `bool queries`.
-One of the ways is to add multiple queries under the `should clause`. 
+There are many ways you can fine-tune the relevance of `bool queries`.  One of the ways is to add multiple queries under the `should clause`. 
 
 **Adding multiple queries under the should clause**
 
@@ -778,6 +778,7 @@ To do this, you can add multiple `queries` to the `should clause`.
 This will cast a wider net because none of the `queries` in the should clause need to match. However, the ones that match the `queries` under the `should clause` will be given a higher score and placed higher in the search results.
 
 This approach allows you to maintain a high recall but also gives you a way to customize the precision of top hits.
+
 Example:
 ```
 GET news_headlines/_search
@@ -814,7 +815,7 @@ GET news_headlines/_search
 ```
 Expected response from Elasticsearch:
 
-Adding many queries under the `should clause` did not reduce the number of hits(207). However, it favored documents that match the queries in the `should clause` and improved the precision of top search results. 
+Adding many `queries` under the `should clause` did not reduce the number of hits(207). However, it favored documents that match the `queries` in the `should clause` and improved the precision of top search results. 
 
 ![image](https://user-images.githubusercontent.com/60980933/108548611-51a8f980-72a9-11eb-8310-0fe14286e437.png)
 
