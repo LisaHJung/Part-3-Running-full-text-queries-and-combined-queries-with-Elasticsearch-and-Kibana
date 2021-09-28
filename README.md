@@ -105,6 +105,8 @@ GET Enter_name_of_index_here/_search
   }
 }
 ```
+![image](https://user-images.githubusercontent.com/60980933/135136014-0c608cfe-9991-459b-a749-505f7c699fcf.png)
+
 ###  Searching for a phrase
 #### What happens when you use the `match query` to search for phrases?
 Let's search for articles about Ed Sheeran's song "Shape of you" using the `match query`.
