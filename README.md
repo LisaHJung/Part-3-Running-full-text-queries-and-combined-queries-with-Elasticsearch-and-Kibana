@@ -24,7 +24,7 @@ Workshop objectives:
 
 [Mini Beginner's Crash Course to Elasticsearch & Kibana playlist](https://ela.st/mini-beginners-crash-course)
 
-Do you prefer learning by watching shorter videos? Check out this playlist to watch short clips of beginner's crash course full length workshops. Season 2 clips will be uploaded here in the future! 
+Do you prefer learning by watching shorter videos? Check out this playlist to watch short clips of beginner's crash course full length workshops. Part 3 workshop is broken down into episodes 11-14.  Season 2 clips will be uploaded here in the future! 
 
 [Presentation](https://github.com/LisaHJung/Part-3-Running-full-text-queries-and-combined-queries-with-Elasticsearch-and-Kibana/blob/main/Part%203_%20Running%20full%20text%20queries%20and%20combined%20queries%20with%20Elasticsearch%20and%20Kibana.pdf)
 
