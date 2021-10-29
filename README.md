@@ -22,6 +22,10 @@ Workshop objectives:
 
 [Video Recording](https://www.youtube.com/watch?v=2KgJ6TQPIIA&t=374s) of the workshop
 
+[Mini Beginner's Crash Course to Elasticsearch & Kibana playlist](https://ela.st/mini-beginners-crash-course)
+
+Do you prefer learning by watching shorter videos? Check out this playlist to watch short clips of beginner's crash course full length workshops. Season 2 clips will be uploaded here in the future! 
+
 [Presentation](https://github.com/LisaHJung/Part-3-Running-full-text-queries-and-combined-queries-with-Elasticsearch-and-Kibana/blob/main/Part%203_%20Running%20full%20text%20queries%20and%20combined%20queries%20with%20Elasticsearch%20and%20Kibana.pdf)
 
 [News headlines dataset](https://www.kaggle.com/rmisra/news-category-dataset) from Kaggle used for workshop
